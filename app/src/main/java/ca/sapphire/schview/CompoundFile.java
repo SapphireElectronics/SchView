@@ -36,6 +36,10 @@ public class CompoundFile {
 
     int sectorBytes;
 
+    StreamFile sf;
+
+    public boolean done = false;
+
     public CompoundFile( String fileName ) {
         try {
             raf = new RandomAccessFile( fileName, "r" );
@@ -184,7 +188,9 @@ public class CompoundFile {
             e.printStackTrace();
         }
 
-        StreamFile sf = new StreamFile( streamFileName );
+        sf = new StreamFile( streamFileName );
+
+        done = true;
     }
 
     public void traverse( int id ) {

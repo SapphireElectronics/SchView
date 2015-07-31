@@ -4,9 +4,14 @@ import ca.sapphire.schview.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -160,8 +165,83 @@ public class SchViewActivity extends Activity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    public void viewFile() {
-        CompoundFile file = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
+    public final static String TAG = "SchViewActivity";
 
+    boolean shown = false;
+    CompoundFile cf;
+    Handler viewHandler = new Handler();
+
+    Runnable viewRunnable = new Runnable() {
+        @Override
+        public void run()  {
+            if( cf != null)
+                if( cf.done )
+                    if( !shown ) {
+                        showFile( cf );
+                        shown = true;
+                        viewHandler.removeCallbacks( viewRunnable );
+                    }
+
+            viewHandler.postDelayed( viewRunnable, 100 );
+        }
+    };
+
+    public void viewFile() {
+        viewHandler.postDelayed( viewRunnable, 100 );
+        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
+    }
+
+    public void showFile( CompoundFile cf ) {
+        Log.i(TAG, "Ready to show.");
+//        cf.sf.wires
+
+        Sch sch = new Sch( this );
+        setContentView( sch );
+        sch.setBackgroundColor( Color.WHITE );
+        sch.invalidate();
+    }
+
+//    public class Sch extends SurfaceView implements SurfaceHolder.Callback {
+    public class Sch extends View {
+        Paint paint = new Paint();
+
+        public Sch( Context context ) {
+            super( context );
+
+
+        }
+
+        protected void onDraw(Canvas canvas) {
+            Log.i(TAG, "Drawing.");
+
+            paint.setColor(Color.RED);
+
+//            for( StreamFile.CompPin compPin : cf.sf.compPins) {
+//                compPin.draw( canvas, paint );
+//            }
+//            for( StreamFile.Wire wire : cf.sf.wires ) {
+//                wire.draw( canvas, paint );
+//            }
+//            for( StreamFile.CompLine compLine : cf.sf.compLines) {
+//                compLine.draw( canvas, paint );
+//            }
+//            for( StreamFile.Junction junction : cf.sf.junctions ) {
+//                junction.draw(canvas, paint);
+//            }
+//            for( StreamFile.Entry entry : cf.sf.entries ) {
+//                entry.draw( canvas, paint );
+//            }
+
+            for(StreamFile.Line line : cf.sf.lines) {
+                line.draw( canvas, paint );
+            }
+
+            for(StreamFile.Circle circle : cf.sf.circles) {
+                circle.draw( canvas, paint );
+            }
+
+        }
     }
 }
+
+
