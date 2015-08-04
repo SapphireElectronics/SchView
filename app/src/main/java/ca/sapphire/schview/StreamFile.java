@@ -67,7 +67,7 @@ public class StreamFile {
 
 
 //    public ArrayList<Line> lines = new ArrayList<>();
-    public ArrayList<Circle> circles = new ArrayList<>();
+//    public ArrayList<Circle> circles = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<>();
 //    public ArrayList<Font> fonts = new ArrayList<>();
     public ArrayList<Text> texts = new ArrayList<>();
@@ -376,11 +376,11 @@ public class StreamFile {
     }
 
     public void addJunction(Map<String, String> record) {
-        Circle circle = new Circle();
-        circle.x = Integer.parseInt(record.get("LOCATION.X"));
-        circle.y = Integer.parseInt(record.get("LOCATION.Y"));
-        circle.radius = 2;
-        circle.color = Integer.parseInt(record.get("COLOR"));
+        int x = Integer.parseInt(record.get("LOCATION.X"));
+        int y = Integer.parseInt(record.get("LOCATION.Y"));
+        int color = Integer.parseInt(record.get("COLOR"));
+
+        renderer.addCircle( x, y, 2, color );
     }
 
     public void addEntry(Map<String, String> record) {
@@ -407,14 +407,14 @@ public class StreamFile {
 //        }
 //    }
 
-    public class Circle {
-        public int x,y,radius,color;
-
-        public void draw( Canvas canvas, Paint paint ) {
-            paint.setColor( altiumToRGB(color) );
-            canvas.drawCircle( x, y, radius, paint );
-        }
-    }
+//    public class Circle {
+//        public int x,y,radius,color;
+//
+//        public void draw( Canvas canvas, Paint paint ) {
+//            paint.setColor( altiumToRGB(color) );
+//            canvas.drawCircle( x, y, radius, paint );
+//        }
+//    }
 
     public class Polygon {
         public Path path = new Path();

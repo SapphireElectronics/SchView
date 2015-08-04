@@ -51,6 +51,10 @@ public class Render {
         texts.add( new Text( x, y, fontId, text ) );
     }
 
+    public void addCircle( int x, int y, int radius, int color ) {
+        circles.add( new Circle( x, y, radius, color ) );
+    }
+
     public class Line {
         public int x1,y1,x2,y2,color;
 
@@ -72,6 +76,13 @@ public class Render {
 
     public class Circle {
         public int x,y,radius,color;
+
+        public Circle( int x, int y, int radius, int color ) {
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            this.color = color;
+        }
 
         public void draw( Canvas canvas, Paint paint ) {
             paint.setColor( altiumToRGB(color) );
