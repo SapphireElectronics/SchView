@@ -232,8 +232,8 @@ public class SchViewActivity extends Activity {
 //                entry.draw( canvas, paint );
 //            }
 
-            canvas.scale( 1, -1 );
-            canvas.translate( 0, -800 );
+//            canvas.scale( 1, -1 );
+            canvas.translate( 0, 800 );
 
             for(StreamFile.Line line : cf.sf.lines) {
                 line.draw( canvas, paint );
@@ -250,6 +250,8 @@ public class SchViewActivity extends Activity {
             for( StreamFile.Text text : cf.sf.texts ) {
                 text.draw( canvas, paint );
             }
+
+            cf.sf.renderer.draw( canvas, paint );
         }
     }
 }

@@ -1,10 +1,8 @@
 package ca.sapphire.schview;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Typeface;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -15,6 +13,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ca.sapphire.altium.Options;
+import ca.sapphire.altium.PowerPort;
+import ca.sapphire.altium.Render;
 
 /**
  * Created by apreston on 7/30/2015.
@@ -38,11 +40,12 @@ import java.util.Map;
  * 12   N   Component graphic - circle (loc.x, loc.y, radius, color, endangle)
  * 13   Y   Component graphic - line (loc.x, loc.y, corn.x, corn.y, color)
  * 14 	Y   Component box (loc x/y, cornerx/y, color, areacolor, transpartent t/f, issolid t/f (only draw if last two parts exist
+ * 17   Y   Power Port: Implemented as an object
  * 25	N   Net label
  * 26	Y	Bus - multi segment line: LOCATIONCOUNT segments, X1,Y1 , X2,Y2 etc.  TODO bus width
  * 27 	Y	Wire
  * 29 	Y	Junction
- * 31   N   Fine info Fonts: fontidcount, size#=, fontname#=  eg SIZE1=10 FONTNAME1=Times.New.Roman
+ * 31   Y   Options: Implemented as an object
  * 34	N	Component Designator - loc x/y, name, text, justification, fontid,
  * 37	Y	Bus entry ("LOCATION.X/Y" is the Bus end of the entry, CORNER.X/Y is the Wire end
  * 41 	N	Component Attribute (text) - loc.x/y, name, text, ishidden:t/f, color, fontid
@@ -62,16 +65,17 @@ public class StreamFile {
     public int recordsRead = 0;
 //    public int fpr = 0;
 
-//    public ArrayList<CompPin> compPins = new ArrayList<>();
-//    public ArrayList<CompLine> compLines = new ArrayList<>();
-//    public ArrayList<Wire> wires = new ArrayList<>();
-//    public ArrayList<Junction> junctions = new ArrayList<>();
 
     public ArrayList<Line> lines = new ArrayList<>();
     public ArrayList<Circle> circles = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<>();
-    public ArrayList<Font> fonts = new ArrayList<>();
+//    public ArrayList<Font> fonts = new ArrayList<>();
     public ArrayList<Text> texts = new ArrayList<>();
+
+    public Render renderer = new Render();
+    public Options options;
+
+    public ArrayList<PowerPort> powerPorts = new ArrayList<>();
 
 
     public StreamFile(String fileName) {
@@ -140,6 +144,9 @@ public class StreamFile {
                 case 2:
                     addCompPin(result);
                     break;
+                case 4:
+                    addText(result);
+                    break;
                 case 6:
                     addCompLine(result);
                     break;
@@ -152,6 +159,11 @@ public class StreamFile {
                 case 14:
                     addCompGraphicBox(result);
                     break;
+
+                case 17:
+                    powerPorts.add(new PowerPort(result, renderer) );
+                    break;
+
                 case 26:
                     addBus(result);
                     break;
@@ -162,7 +174,7 @@ public class StreamFile {
                     addJunction(result);
                     break;
                 case 31:
-                    addFonts(result);
+                    options = new Options( result, renderer );
                     break;
                 case 37:
                     addEntry(result);
@@ -232,13 +244,13 @@ public class StreamFile {
 //        }
 //    }
 
-    public void addFonts(Map<String, String> record) {
-        int size = Integer.parseInt(record.get("FONTIDCOUNT"));
-        for (int i = 0; i < size; i++) {
-            int fontSize = Integer.parseInt((String) record.get("SIZE" + String.valueOf(i + 1)));
-            fonts.add(fontSize, null);
-        }
-    }
+//    public void addFonts(Map<String, String> record) {
+//        int size = Integer.parseInt(record.get("FONTIDCOUNT"));
+//        for (int i = 0; i < size; i++) {
+//            int fontSize = Integer.parseInt((String) record.get("SIZE" + String.valueOf(i + 1)));
+//            fonts.add( new Font( fontSize, null ) );
+//        }
+//    }
 
 
     public void addCompPin(Map<String, String> record) {
@@ -271,6 +283,16 @@ public class StreamFile {
         }
     }
 
+    public void addText( Map<String, String> record) {
+// Text (loc x/y, text, fontid, color
+        int x = Integer.parseInt(record.get("LOCATION.X"));
+        int y = Integer.parseInt(record.get("LOCATION.Y"));
+        int fontId = Integer.parseInt(record.get("FONTID"));
+        int color = Integer.parseInt(record.get("COLOR"));
+
+        texts.add(  new Text( x, y, fontId, record.get("TEXT")));
+    }
+
     public void addMultiLine( Map<String, String> record) {
         int size = Integer.parseInt(record.get("LOCATIONCOUNT"));
         int x[] = new int[size];
@@ -291,9 +313,9 @@ public class StreamFile {
     public void addCornerLine( Map<String, String> record) {
         Line line = new Line();
         line.x1 = Integer.parseInt(record.get("LOCATION.X"));
-        line.y1 = Integer.parseInt(record.get("LOCATION.Y"));
+        line.y1 = -Integer.parseInt(record.get("LOCATION.Y"));
         line.x2 = Integer.parseInt(record.get("CORNER.X"));
-        line.y2 = Integer.parseInt(record.get("CORNER.Y"));
+        line.y2 = -Integer.parseInt(record.get("CORNER.Y"));
         line.color = Integer.parseInt(record.get("COLOR"));
         lines.add(line);
     }
@@ -374,9 +396,9 @@ public class StreamFile {
 
         public Line( int x1, int y1, int x2, int y2, int color ) {
             this.x1 = x1;
-            this.y1 = y1;
+            this.y1 = -y1;
             this.x2 = x2;
-            this.y2 = y2;
+            this.y2 = -y2;
             this.color = color;
         }
 
@@ -404,11 +426,11 @@ public class StreamFile {
         {
             this.color = color;
             this.filled = filled;
-            path.moveTo(x[0], y[0]);
+            path.moveTo(x[0], -y[0]);
             for (int i = 1; i < x.length; i++) {
-                path.lineTo( x[i], y[i] );
+                path.lineTo( x[i], -y[i] );
             }
-            path.lineTo(x[0], y[0]);
+            path.lineTo(x[0], -y[0]);
         }
 
         public void draw( Canvas canvas, Paint paint ) {
@@ -424,28 +446,20 @@ public class StreamFile {
         }
     }
 
-    public class Font {
-        int size;
-
-        public Font( int size, String name ) {
-//            Typeface.create("sans-serif-light", Typeface.NORMAL);
-            this.size = size;
-        }
-    }
-
     public class Text {
         int x, y, fontId;
         String name;
 
         public Text( int x, int y, int fontID, String name ) {
             this.x = x;
-            this.y = y;
+            this.y = -y;
             this.fontId = fontID;
             this.name = name;
         }
 
         public void draw( Canvas canvas, Paint paint ) {
-            paint.setTextSize( fonts.get( fontId ).size );
+            paint.setTextSize( renderer.fonts.get( fontId ).size );
+//            paint.setTextSize( fonts.get( fontId ).size );
             canvas.drawText( name, x, y, paint );
         }
     }
