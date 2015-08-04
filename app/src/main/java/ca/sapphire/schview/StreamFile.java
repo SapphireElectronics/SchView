@@ -66,7 +66,7 @@ public class StreamFile {
 //    public int fpr = 0;
 
 
-    public ArrayList<Line> lines = new ArrayList<>();
+//    public ArrayList<Line> lines = new ArrayList<>();
     public ArrayList<Circle> circles = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<>();
 //    public ArrayList<Font> fonts = new ArrayList<>();
@@ -267,16 +267,16 @@ public class StreamFile {
 
         switch (option & 0x03) {
             case 0:
-                lines.add(new Line(x, y, x + 10, y, 0xff0000));
+                renderer.addLine(x, y, x + 10, y, 0xff0000);
                 break;
             case 1:
-                lines.add(new Line(x, y, x, y + 10, 0xff0000));
+                renderer.addLine(x, y, x, y + 10, 0xff0000);
                 break;
             case 2:
-                lines.add(new Line(x, y, x - 10, y, 0xff0000));
+                renderer.addLine(x, y, x - 10, y, 0xff0000);
                 break;
             case 3:
-                lines.add(new Line(x, y, x, y - 10, 0xff0000));
+                renderer.addLine(x, y, x, y - 10, 0xff0000);
                 break;
 
 
@@ -305,19 +305,18 @@ public class StreamFile {
         int color = Integer.parseInt(record.get("COLOR"));
 
         for (int i = 0; i < size-1; i++) {
-            lines.add( new Line(x[i], y[i], x[i+1], y[i+1], color ) );
+            renderer.addLine(x[i], y[i], x[i + 1], y[i + 1], color);
         }
 
     }
 
     public void addCornerLine( Map<String, String> record) {
-        Line line = new Line();
-        line.x1 = Integer.parseInt(record.get("LOCATION.X"));
-        line.y1 = -Integer.parseInt(record.get("LOCATION.Y"));
-        line.x2 = Integer.parseInt(record.get("CORNER.X"));
-        line.y2 = -Integer.parseInt(record.get("CORNER.Y"));
-        line.color = Integer.parseInt(record.get("COLOR"));
-        lines.add(line);
+        int x1 = Integer.parseInt(record.get("LOCATION.X"));
+        int y1 = Integer.parseInt(record.get("LOCATION.Y"));
+        int x2 = Integer.parseInt(record.get("CORNER.X"));
+        int y2 = Integer.parseInt(record.get("CORNER.Y"));
+        int color = Integer.parseInt(record.get("COLOR"));
+        renderer.addLine( x1, y1, x2, y2, color );
     }
 
     public void addPolygon( Map<String, String> record) {
@@ -389,24 +388,24 @@ public class StreamFile {
     }
 
 
-    public class Line {
-        public int x1,y1,x2,y2,color;
-
-        public Line() {}
-
-        public Line( int x1, int y1, int x2, int y2, int color ) {
-            this.x1 = x1;
-            this.y1 = -y1;
-            this.x2 = x2;
-            this.y2 = -y2;
-            this.color = color;
-        }
-
-        public void draw( Canvas canvas, Paint paint ) {
-            paint.setColor( altiumToRGB(color) );
-            canvas.drawLine(x1, y1, x2, y2, paint);
-        }
-    }
+//    public class Line {
+//        public int x1,y1,x2,y2,color;
+//
+//        public Line() {}
+//
+//        public Line( int x1, int y1, int x2, int y2, int color ) {
+//            this.x1 = x1;
+//            this.y1 = -y1;
+//            this.x2 = x2;
+//            this.y2 = -y2;
+//            this.color = color;
+//        }
+//
+//        public void draw( Canvas canvas, Paint paint ) {
+//            paint.setColor( altiumToRGB(color) );
+//            canvas.drawLine(x1, y1, x2, y2, paint);
+//        }
+//    }
 
     public class Circle {
         public int x,y,radius,color;

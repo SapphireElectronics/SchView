@@ -39,6 +39,10 @@ public class Render {
         lines.add(new Line(start.x, start.y, end.x, end.y, color));
     }
 
+    public void addLine( int x1, int y1, int x2, int y2, int color ) {
+        lines.add( new Line( x1, y1, x2, y2, color));
+    }
+
     public void addFont(int size, String name) {
         fonts.add( new Font(size, name));
     }

@@ -235,9 +235,9 @@ public class SchViewActivity extends Activity {
 //            canvas.scale( 1, -1 );
             canvas.translate( 0, 800 );
 
-            for(StreamFile.Line line : cf.sf.lines) {
-                line.draw( canvas, paint );
-            }
+//            for(StreamFile.Line line : cf.sf.lines) {
+//                line.draw( canvas, paint );
+//            }
 
             for(StreamFile.Circle circle : cf.sf.circles) {
                 circle.draw( canvas, paint );
