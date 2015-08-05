@@ -59,6 +59,10 @@ public class Render {
         polygons.add( new Polygon( x, y, color, filled ));
     }
 
+    public void addText( int x, int y, int fontId, String name ) {
+        texts.add( new Text( x, y, fontId, name ));
+    }
+
     public class Line {
         public int x1,y1,x2,y2,color;
 

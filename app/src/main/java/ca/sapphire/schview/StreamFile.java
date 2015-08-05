@@ -70,7 +70,7 @@ public class StreamFile {
 //    public ArrayList<Circle> circles = new ArrayList<>();
 //    public ArrayList<Polygon> polygons = new ArrayList<>();
 //    public ArrayList<Font> fonts = new ArrayList<>();
-    public ArrayList<Text> texts = new ArrayList<>();
+//    public ArrayList<Text> texts = new ArrayList<>();
 
     public Render renderer = new Render();
     public Options options;
@@ -284,13 +284,12 @@ public class StreamFile {
     }
 
     public void addText( Map<String, String> record) {
-// Text (loc x/y, text, fontid, color
         int x = Integer.parseInt(record.get("LOCATION.X"));
         int y = Integer.parseInt(record.get("LOCATION.Y"));
         int fontId = Integer.parseInt(record.get("FONTID"));
         int color = Integer.parseInt(record.get("COLOR"));
 
-        texts.add(  new Text( x, y, fontId, record.get("TEXT")));
+        renderer.addText( x, y, fontId, record.get("TEXT") );
     }
 
     public void addMultiLine( Map<String, String> record) {
@@ -333,7 +332,7 @@ public class StreamFile {
         int area = Integer.parseInt(record.get("AREACOLOR"));
 
         renderer.addPolygon(x, y, area, true);
-        renderer.addPolygon( x, y, outline, false );
+        renderer.addPolygon(x, y, outline, false );
     }
 
     public void addWire(Map<String, String> record) {
