@@ -193,11 +193,11 @@ public class SchViewActivity extends Activity {
 
     public void showFile( CompoundFile cf ) {
         Log.i(TAG, "Ready to show.");
-//        cf.sf.wires
 
         Sch sch = new Sch( this );
-        setContentView( sch );
-        sch.setBackgroundColor( Color.WHITE );
+        setContentView(sch);
+//        sch.setBackgroundColor( Color.WHITE );
+        sch.setBackgroundColor( 0xfffffcf8 );
         sch.invalidate();
     }
 
@@ -207,50 +207,12 @@ public class SchViewActivity extends Activity {
 
         public Sch( Context context ) {
             super( context );
-
-
         }
 
         protected void onDraw(Canvas canvas) {
             Log.i(TAG, "Drawing.");
-
             paint.setColor(Color.RED);
-
-//            for( StreamFile.CompPin compPin : cf.sf.compPins) {
-//                compPin.draw( canvas, paint );
-//            }
-//            for( StreamFile.Wire wire : cf.sf.wires ) {
-//                wire.draw( canvas, paint );
-//            }
-//            for( StreamFile.CompLine compLine : cf.sf.compLines) {
-//                compLine.draw( canvas, paint );
-//            }
-//            for( StreamFile.Junction junction : cf.sf.junctions ) {
-//                junction.draw(canvas, paint);
-//            }
-//            for( StreamFile.Entry entry : cf.sf.entries ) {
-//                entry.draw( canvas, paint );
-//            }
-
-//            canvas.scale( 1, -1 );
             canvas.translate( 0, 800 );
-
-//            for(StreamFile.Line line : cf.sf.lines) {
-//                line.draw( canvas, paint );
-//            }
-
-//            for(StreamFile.Circle circle : cf.sf.circles) {
-//                circle.draw( canvas, paint );
-//            }
-
-//            for( StreamFile.Polygon polygon : cf.sf.polygons) {
-//                polygon.draw( canvas, paint );
-//            }
-
-//            for( StreamFile.Text text : cf.sf.texts ) {
-//                text.draw( canvas, paint );
-//            }
-
             cf.sf.renderer.draw( canvas, paint );
         }
     }

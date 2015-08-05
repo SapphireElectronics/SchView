@@ -11,59 +11,44 @@ import java.util.ArrayList;
  * Created by apreston on 8/4/2015.
  */
 public class Render {
-    public ArrayList<Line> lines = new ArrayList<>();
-    public ArrayList<Circle> circles = new ArrayList<>();
-    public ArrayList<Polygon> polygons = new ArrayList<>();
+    public ArrayList<GraphicsObject> objects = new ArrayList<>();
+
     public ArrayList<Font> fonts = new ArrayList<>();
-    public ArrayList<Text> texts = new ArrayList<>();
 
     public void draw(Canvas canvas, Paint paint) {
-        for (Line line : lines) {
-            line.draw(canvas, paint);
-        }
-
-        for (Circle circle : circles) {
-            circle.draw(canvas, paint);
-        }
-
-        for (Polygon polygon : polygons) {
-            polygon.draw(canvas, paint);
-        }
-
-        for (Text text : texts) {
-            text.draw(canvas, paint);
-        }
+        for( GraphicsObject object : objects )
+            object.draw( canvas, paint );
     }
 
     public void addLine(Point start, Point end, int color) {
-        lines.add(new Line(start.x, start.y, end.x, end.y, color));
+        objects.add( new Line(start.x, start.y, end.x, end.y, color));
     }
 
     public void addLine( int x1, int y1, int x2, int y2, int color ) {
-        lines.add( new Line( x1, y1, x2, y2, color));
+        objects.add( new Line( x1, y1, x2, y2, color));
     }
 
     public void addFont(int size, String name) {
-        fonts.add( new Font(size, name));
+        fonts.add( new Font(size, name) );
     }
 
     public void addText( String text, int x, int y, int fontId, int color) {
-        texts.add( new Text( x, y, fontId, text ) );
+        objects.add( new Text( x, y, fontId, text ) );
     }
 
     public void addCircle( int x, int y, int radius, int color ) {
-        circles.add( new Circle( x, y, radius, color ) );
+        objects.add( new Circle( x, y, radius, color ) );
     }
 
     public void addPolygon( int[] x, int[] y, int color, boolean filled ) {
-        polygons.add( new Polygon( x, y, color, filled ));
+        objects.add( new Polygon( x, y, color, filled ));
     }
 
     public void addText( int x, int y, int fontId, String name ) {
-        texts.add( new Text( x, y, fontId, name ));
+        objects.add( new Text( x, y, fontId, name ));
     }
 
-    public class Line {
+    public class Line implements GraphicsObject {
         public int x1,y1,x2,y2,color;
 
         public Line() {}
@@ -82,7 +67,7 @@ public class Render {
         }
     }
 
-    public class Circle {
+    public class Circle implements GraphicsObject {
         public int x,y,radius,color;
 
         public Circle( int x, int y, int radius, int color ) {
@@ -98,7 +83,7 @@ public class Render {
         }
     }
 
-    public class Polygon {
+    public class Polygon implements GraphicsObject{
         public Path path = new Path();
         public int color;
         public boolean filled;
@@ -127,16 +112,18 @@ public class Render {
         }
     }
 
-    public class Font {
+    public class Font implements GraphicsObject {
         public int size;
 
         public Font( int size, String name ) {
 //            Typeface.create("sans-serif-light", Typeface.NORMAL);
             this.size = (int) (size * 1.25);
         }
+
+        public void draw( Canvas canvas, Paint paint ) {}
     }
 
-    public class Text {
+    public class Text implements GraphicsObject {
         int x, y, fontId;
         String name;
 

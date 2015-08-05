@@ -156,5 +156,18 @@ public abstract class Utility {
                 return;
         }
     }
+
+    static public Point[] addMultiLine( Map<String, String> record) {
+        int size = Integer.parseInt(record.get("LOCATIONCOUNT"));
+        Point[] point = new Point[size];
+
+        for (int i = 0; i < size; i++) {
+            point[i] = new Point();
+            point[i].x = Integer.parseInt((String) record.get("X" + String.valueOf(i + 1)));
+            point[i].y = Integer.parseInt((String) record.get("Y" + String.valueOf(i + 1)));
+        }
+
+        return point;
+    }
 }
 

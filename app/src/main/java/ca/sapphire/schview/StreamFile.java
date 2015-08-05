@@ -1,8 +1,5 @@
 package ca.sapphire.schview;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -17,6 +14,7 @@ import java.util.Map;
 import ca.sapphire.altium.Options;
 import ca.sapphire.altium.PowerPort;
 import ca.sapphire.altium.Render;
+import ca.sapphire.altium.Wire;
 
 /**
  * Created by apreston on 7/30/2015.
@@ -53,9 +51,6 @@ import ca.sapphire.altium.Render;
  * 45 	N	Component description?
  * 46	N	?? (single field)
  * 48	N	?? (single field)
- *
- * File Info:
- *      Fonts: fontidcount, size#=, fontname#=  eg SIZE1=10 FONTNAME1=Times.New.Roman
  */
 
 public class StreamFile {
@@ -65,17 +60,13 @@ public class StreamFile {
     public int recordsRead = 0;
 //    public int fpr = 0;
 
-
-//    public ArrayList<Line> lines = new ArrayList<>();
-//    public ArrayList<Circle> circles = new ArrayList<>();
-//    public ArrayList<Polygon> polygons = new ArrayList<>();
-//    public ArrayList<Font> fonts = new ArrayList<>();
-//    public ArrayList<Text> texts = new ArrayList<>();
-
     public Render renderer = new Render();
     public Options options;
 
     public ArrayList<PowerPort> powerPorts = new ArrayList<>();
+    public ArrayList<Wire> wires = new ArrayList<>();
+
+    public ArrayList<Object> objects = new ArrayList<>();
 
 
     public StreamFile(String fileName) {
@@ -148,7 +139,8 @@ public class StreamFile {
                     addText(result);
                     break;
                 case 6:
-                    addCompLine(result);
+                    objects.add( new Wire( result, renderer ));
+//                    wires.add( new Wire( result, renderer ));
                     break;
                 case 7:
                     addPolygon(result);
@@ -161,7 +153,8 @@ public class StreamFile {
                     break;
 
                 case 17:
-                    powerPorts.add(new PowerPort(result, renderer) );
+                    objects.add(new PowerPort(result, renderer) );
+//                    powerPorts.add(new PowerPort(result, renderer) );
                     break;
 
                 case 26:
@@ -211,47 +204,6 @@ public class StreamFile {
                 ((int) (bis.read() & 0xff) << 16) |
                 ((int) (bis.read() & 0xff) << 24));
     }
-
-//    public class CompPin {
-//        int x, y, length, designator, option;
-//        String name;
-//
-//        public CompPin(Map<String, String> record) {
-//            x = Integer.parseInt(record.get("LOCATION.X"));
-//            y = Integer.parseInt(record.get("LOCATION.Y"));
-//            length = Integer.parseInt(record.get("PINLENGTH"));
-//            designator = Integer.parseInt(record.get("DESIGNATOR"));
-//            option = Integer.parseInt(record.get("PINCONGLOMERATE"));
-//            if (record.get("NAME ") != null)
-//                name = record.get("NAME");
-//        }
-//
-//        public void draw(Canvas canvas, Paint paint) {
-//            switch (option & 0x03) {
-//                case 0:
-//                    canvas.drawLine(x, y, x + 10, y, paint);
-//                    break;
-//                case 1:
-//                    canvas.drawLine(x, y, x, y + 10, paint);
-//                    break;
-//                case 2:
-//                    canvas.drawLine(x, y, x - 10, y, paint);
-//                    break;
-//                case 3:
-//                    canvas.drawLine(x, y, x, y - 10, paint);
-//                    break;
-//            }
-//        }
-//    }
-
-//    public void addFonts(Map<String, String> record) {
-//        int size = Integer.parseInt(record.get("FONTIDCOUNT"));
-//        for (int i = 0; i < size; i++) {
-//            int fontSize = Integer.parseInt((String) record.get("SIZE" + String.valueOf(i + 1)));
-//            fonts.add( new Font( fontSize, null ) );
-//        }
-//    }
-
 
     public void addCompPin(Map<String, String> record) {
         int x = Integer.parseInt(record.get("LOCATION.X"));
@@ -384,82 +336,6 @@ public class StreamFile {
 
     public void addEntry(Map<String, String> record) {
         addCornerLine( record );
-    }
-
-
-//    public class Line {
-//        public int x1,y1,x2,y2,color;
-//
-//        public Line() {}
-//
-//        public Line( int x1, int y1, int x2, int y2, int color ) {
-//            this.x1 = x1;
-//            this.y1 = -y1;
-//            this.x2 = x2;
-//            this.y2 = -y2;
-//            this.color = color;
-//        }
-//
-//        public void draw( Canvas canvas, Paint paint ) {
-//            paint.setColor( altiumToRGB(color) );
-//            canvas.drawLine(x1, y1, x2, y2, paint);
-//        }
-//    }
-
-//    public class Circle {
-//        public int x,y,radius,color;
-//
-//        public void draw( Canvas canvas, Paint paint ) {
-//            paint.setColor( altiumToRGB(color) );
-//            canvas.drawCircle( x, y, radius, paint );
-//        }
-//    }
-
-    public class Polygon {
-        public Path path = new Path();
-        public int color;
-        public boolean filled;
-
-        public Polygon( int[] x, int[] y, int color, boolean filled )
-        {
-            this.color = color;
-            this.filled = filled;
-            path.moveTo(x[0], -y[0]);
-            for (int i = 1; i < x.length; i++) {
-                path.lineTo( x[i], -y[i] );
-            }
-            path.lineTo(x[0], -y[0]);
-        }
-
-        public void draw( Canvas canvas, Paint paint ) {
-            paint.setColor( altiumToRGB(color));
-            if( filled ) {
-                paint.setStyle(Paint.Style.FILL);
-                canvas.drawPath(path, paint);
-            }
-            else {
-                paint.setStyle(Paint.Style.STROKE);
-                canvas.drawPath(path, paint);
-            }
-        }
-    }
-
-    public class Text {
-        int x, y, fontId;
-        String name;
-
-        public Text( int x, int y, int fontID, String name ) {
-            this.x = x;
-            this.y = -y;
-            this.fontId = fontID;
-            this.name = name;
-        }
-
-        public void draw( Canvas canvas, Paint paint ) {
-            paint.setTextSize( renderer.fonts.get( fontId ).size );
-//            paint.setTextSize( fonts.get( fontId ).size );
-            canvas.drawText( name, x, y, paint );
-        }
     }
 
     public int altiumToRGB( int altColor )
