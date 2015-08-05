@@ -55,6 +55,10 @@ public class Render {
         circles.add( new Circle( x, y, radius, color ) );
     }
 
+    public void addPolygon( int[] x, int[] y, int color, boolean filled ) {
+        polygons.add( new Polygon( x, y, color, filled ));
+    }
+
     public class Line {
         public int x1,y1,x2,y2,color;
 

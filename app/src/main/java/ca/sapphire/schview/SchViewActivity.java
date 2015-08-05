@@ -243,9 +243,9 @@ public class SchViewActivity extends Activity {
 //                circle.draw( canvas, paint );
 //            }
 
-            for( StreamFile.Polygon polygon : cf.sf.polygons) {
-                polygon.draw( canvas, paint );
-            }
+//            for( StreamFile.Polygon polygon : cf.sf.polygons) {
+//                polygon.draw( canvas, paint );
+//            }
 
             for( StreamFile.Text text : cf.sf.texts ) {
                 text.draw( canvas, paint );

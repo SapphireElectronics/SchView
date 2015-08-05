@@ -68,7 +68,7 @@ public class StreamFile {
 
 //    public ArrayList<Line> lines = new ArrayList<>();
 //    public ArrayList<Circle> circles = new ArrayList<>();
-    public ArrayList<Polygon> polygons = new ArrayList<>();
+//    public ArrayList<Polygon> polygons = new ArrayList<>();
 //    public ArrayList<Font> fonts = new ArrayList<>();
     public ArrayList<Text> texts = new ArrayList<>();
 
@@ -316,7 +316,7 @@ public class StreamFile {
         int x2 = Integer.parseInt(record.get("CORNER.X"));
         int y2 = Integer.parseInt(record.get("CORNER.Y"));
         int color = Integer.parseInt(record.get("COLOR"));
-        renderer.addLine( x1, y1, x2, y2, color );
+        renderer.addLine(x1, y1, x2, y2, color);
     }
 
     public void addPolygon( Map<String, String> record) {
@@ -332,8 +332,8 @@ public class StreamFile {
         int outline = Integer.parseInt(record.get("COLOR"));
         int area = Integer.parseInt(record.get("AREACOLOR"));
 
-        polygons.add( new Polygon(x, y, area, true ));
-        polygons.add( new Polygon( x, y, outline, false ));
+        renderer.addPolygon(x, y, area, true);
+        renderer.addPolygon( x, y, outline, false );
     }
 
     public void addWire(Map<String, String> record) {
@@ -367,8 +367,8 @@ public class StreamFile {
         int outline = Integer.parseInt(record.get("COLOR"));
         int area = Integer.parseInt(record.get("AREACOLOR"));
 
-        polygons.add( new Polygon(x, y, area, true ));
-        polygons.add( new Polygon( x, y, outline, false ));
+        renderer.addPolygon(x, y, area, true);
+        renderer.addPolygon( x, y, outline, false );
     }
 
     public void addBus( Map<String, String> record) {
