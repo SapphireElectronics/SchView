@@ -4,6 +4,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -31,7 +34,22 @@ public class Wire implements Object, Serializable {
     public void draw( Canvas canvas, Paint paint ) {
         paint.setColor( color );
         for (int i = 0; i < point.length-1; i++)
-            canvas.drawLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, paint );
+            canvas.drawLine( point[i].x, -point[i].y, point[i+1].x, -point[i+1].y, paint );
+
+    }
+
+    @Override
+    public void render() {
+
+    }
+
+    @Override
+    public void read(DataInputStream dis) throws IOException {
+
+    }
+
+    @Override
+    public void write(DataOutputStream dos) throws IOException {
 
     }
 }

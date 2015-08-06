@@ -4,19 +4,29 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
 import ca.sapphire.graphics.Line;
+import ca.sapphire.altium.Options;
 
 /**
  * Contains an Altium Power Port object
  */
 public class PowerPort implements Object, Serializable {
-    int x, y, color, xs[], xe[], ys[], ye[];
+    // data to read and write
+    int x, y, color;
     byte style, rotation, fontId;
     boolean hidden, locked;
     String name;
+
+    // data for rendering
+    float[] linepts;
+    float[] circlePts;
+    float textSize;
 
     public PowerPort( Map<String, String> record ) {
         x = Utility.getIntValue(record, "LOCATION.X");
@@ -28,9 +38,33 @@ public class PowerPort implements Object, Serializable {
         hidden = !Utility.getBooleanValue(record, "SHOWNETNAME");
         locked = Utility.getBooleanValue(record, "GRAPHICALLYLOCKED", false);
         name = record.get( "TEXT");
-
-
     }
+
+    public void read( DataInputStream dis ) throws IOException {
+        x = dis.readInt();
+        y = dis.readInt();
+        color = dis.readInt();
+        style = dis.readByte();
+        rotation = dis.readByte();
+        fontId = dis.readByte();
+        hidden = dis.readBoolean();
+        locked = dis.readBoolean();
+        name = dis.readUTF();
+    }
+
+    public void write( DataOutputStream dos ) throws IOException {
+        dos.writeInt( x );
+        dos.writeInt(y);
+        dos.writeInt(color);
+        dos.writeByte(style);
+        dos.writeByte(rotation);
+        dos.writeByte(fontId);
+        dos.writeBoolean(hidden);
+        dos.writeBoolean(locked);
+        dos.writeUTF( name );
+//        render( null );
+    }
+
 
     /**
      * Styles:
@@ -53,12 +87,20 @@ public class PowerPort implements Object, Serializable {
      * 3 = 270 degrees
      */
 
+    public void render() {
+//        fontSize = fonts.get( fontId ).size
+
+    }
+
     public void render( Render renderer ) {
         // TODO: Add all rendering types
         // TODO: Fix text rendering location
         // Currently only renders bar, arrow without text
 
-        renderer.addText( name, x, y, fontId, color );
+        //renderer.addText(name, x, y, fontId, color);
+
+//        textSize = renderer.fonts.get( fontId ).size;
+        textSize = Options.INSTANCE.fontSize[fontId];
 
         switch( style ) {
             case 1:
@@ -103,8 +145,11 @@ public class PowerPort implements Object, Serializable {
         }
     }
 
-    public void draw( Canvas canvas, Paint paint ) {
-        paint.setColor( color );
+    public void draw(Canvas canvas, Paint paint) {
+        paint.setColor(color);
+        paint.setTextSize(textSize);
+        canvas.drawText(name, x, y, paint);
+
 
     }
 }

@@ -3,9 +3,12 @@ package ca.sapphire.schview;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +72,10 @@ public class StreamFile {
 
     public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
 
+    // todo: remove test code
+    boolean firstPowerPort = true;
+    DataOutputStream dos = null;
+
 
     public StreamFile(String fileName) {
         try {
@@ -78,14 +85,33 @@ public class StreamFile {
         }
 
         try {
+            dos = new DataOutputStream( new FileOutputStream( "/sdcard/Download/gclk.obj" ) );
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
             load();
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
 
         }
 
+        // todo: remove test code
+        try {
+            dos.flush();
+            dos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Log.i(TAG, "Records read: " + recordsRead);
 //        Log.i(TAG, "File pointer: " + fpr );
+
+
+
 
         // render all from Altium Objects to Graphics Objects
         for( ca.sapphire.altium.Object object : objects ) {
@@ -158,7 +184,13 @@ public class StreamFile {
                     break;
 
                 case 17:
-                    objects.add(new PowerPort( result ) );
+                    PowerPort pp;
+                    objects.add(pp = new PowerPort( result ) );
+                    if( firstPowerPort ) {
+                        pp.write( dos );
+                        firstPowerPort = false;
+                    }
+
                     break;
 
                 case 26:
@@ -171,7 +203,9 @@ public class StreamFile {
                     addJunction(result);
                     break;
                 case 31:
-                    options = new Options( result, renderer );
+//                    options = new Options( result, renderer );
+//                    options.put( result, renderer );
+                    options.INSTANCE.put( result );
                     break;
                 case 37:
                     addEntry(result);

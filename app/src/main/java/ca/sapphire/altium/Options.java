@@ -1,17 +1,23 @@
 package ca.sapphire.altium;
 
-import java.io.Serializable;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.Map;
 
 /**
  * Contains an Altium Options record
  */
 
-public class Options implements Object, Serializable {
+public enum Options {
+    INSTANCE;
+
     byte fontCount, fontSize[], fontRotation[];
     String fontName[];
 
-    public Options( Map<String, String> record, Render renderer ) {
+    public void put( Map<String, String> record, Render renderer ) {
         fontCount = Utility.getByteValue( record, "FONTIDCOUNT", (byte) 0 );
 
         fontSize = new byte[fontCount];
@@ -26,8 +32,36 @@ public class Options implements Object, Serializable {
         render( renderer );
     }
 
-    public void render( Render renderer ) {
-        for (int i = 0; i < fontCount; i++)
-            renderer.addFont(fontSize[i], fontName[i]);
+    public void put( Map<String, String> record ) {
+        fontCount = Utility.getByteValue( record, "FONTIDCOUNT", (byte) 0 );
+
+        fontSize = new byte[fontCount];
+        fontRotation = new byte[fontCount];
+        fontName = new String[fontCount];
+
+        for (int i = 0; i < fontCount; i++) {
+            fontSize[i] = Utility.getByteValue(record, "SIZE" + String.valueOf(i + 1));
+            fontRotation[i] = Utility.getByteValue(record, "ROTATION" + String.valueOf(i + 1), (byte) 0);
+            fontName[i] = record.get("FONTNAME" + String.valueOf(i + 1));
+        }
     }
+
+
+    public void read( DataInputStream dis ) {
+
+    }
+
+    public void write( DataOutputStream dos ) {
+
+    }
+
+    public void render( Render renderer ) {
+        for (int i = 0; i < fontCount; i++) {
+            renderer.addFont(fontSize[i], fontName[i]);
+        }
+    }
+
+    public void render() {}
+
+    public void draw( Canvas canvas, Paint paint ) {}
 }
