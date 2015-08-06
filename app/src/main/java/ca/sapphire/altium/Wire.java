@@ -1,9 +1,13 @@
 package ca.sapphire.altium;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 
 import java.io.Serializable;
 import java.util.Map;
+
+import ca.sapphire.graphics.Line;
 
 /**
  * Contains an Altium Wire multisegment object
@@ -12,15 +16,23 @@ public class Wire implements Object, Serializable {
     int color;
     Point point[];
 
-    public Wire(Map<String, String> record, Render renderer) {
+    public Wire( Map<String, String> record ) {
         point = Utility.addMultiLine(record);
         color = Utility.getIntValue(record, "COLOR");
-        render( renderer );
     }
 
     public void render( Render renderer ) {
         for (int i = 0; i < point.length-1; i++)
-            renderer.addLine( point[i], point[i+1], color );
+            renderer.objects.add( new Line( point[i].x, point[i].y, point[i+1].x, point[i+1].y, color ) );
+
+//            renderer.addLine( point[i], point[i+1], color );
+    }
+
+    public void draw( Canvas canvas, Paint paint ) {
+        paint.setColor( color );
+        for (int i = 0; i < point.length-1; i++)
+            canvas.drawLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, paint );
+
     }
 }
 

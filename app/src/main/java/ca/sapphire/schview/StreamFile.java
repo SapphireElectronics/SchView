@@ -15,6 +15,7 @@ import ca.sapphire.altium.Options;
 import ca.sapphire.altium.PowerPort;
 import ca.sapphire.altium.Render;
 import ca.sapphire.altium.Wire;
+import ca.sapphire.graphics.Line;
 
 /**
  * Created by apreston on 7/30/2015.
@@ -66,7 +67,7 @@ public class StreamFile {
     public ArrayList<PowerPort> powerPorts = new ArrayList<>();
     public ArrayList<Wire> wires = new ArrayList<>();
 
-    public ArrayList<Object> objects = new ArrayList<>();
+    public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
 
 
     public StreamFile(String fileName) {
@@ -85,6 +86,11 @@ public class StreamFile {
 
         Log.i(TAG, "Records read: " + recordsRead);
 //        Log.i(TAG, "File pointer: " + fpr );
+
+        // render all from Altium Objects to Graphics Objects
+        for( ca.sapphire.altium.Object object : objects ) {
+            object.render( renderer );
+        }
     }
 
     public boolean load() throws IOException {
@@ -138,9 +144,8 @@ public class StreamFile {
                 case 4:
                     addText(result);
                     break;
-                case 6:
-                    objects.add( new Wire( result, renderer ));
-//                    wires.add( new Wire( result, renderer ));
+                case 6: // todo: Correct this ... these are actually component lines, not wires!!
+                    objects.add( new Wire( result ));
                     break;
                 case 7:
                     addPolygon(result);
@@ -153,8 +158,7 @@ public class StreamFile {
                     break;
 
                 case 17:
-                    objects.add(new PowerPort(result, renderer) );
-//                    powerPorts.add(new PowerPort(result, renderer) );
+                    objects.add(new PowerPort( result ) );
                     break;
 
                 case 26:
@@ -219,16 +223,20 @@ public class StreamFile {
 
         switch (option & 0x03) {
             case 0:
-                renderer.addLine(x, y, x + 10, y, 0xff0000);
+                renderer.objects.add((new Line(x, y, x + 10, y, 0xff0000)));
+//                renderer.addLine(x, y, x + 10, y, 0xff0000);
                 break;
             case 1:
-                renderer.addLine(x, y, x, y + 10, 0xff0000);
+                renderer.objects.add((new Line(x, y, x, y + 10, 0xff0000)));
+//                renderer.addLine(x, y, x, y + 10, 0xff0000);
                 break;
             case 2:
-                renderer.addLine(x, y, x - 10, y, 0xff0000);
+                renderer.objects.add((new Line(x, y, x - 10, y, 0xff0000)));
+//                renderer.addLine(x, y, x - 10, y, 0xff0000);
                 break;
             case 3:
-                renderer.addLine(x, y, x, y - 10, 0xff0000);
+                renderer.objects.add((new Line(x, y, x, y - 10, 0xff0000)));
+//                renderer.addLine(x, y, x, y - 10, 0xff0000);
                 break;
 
 
@@ -256,7 +264,8 @@ public class StreamFile {
         int color = Integer.parseInt(record.get("COLOR"));
 
         for (int i = 0; i < size-1; i++) {
-            renderer.addLine(x[i], y[i], x[i + 1], y[i + 1], color);
+            renderer.objects.add(new Line(x[i], y[i], x[i + 1], y[i + 1], color) );
+//            renderer.addLine(x[i], y[i], x[i + 1], y[i + 1], color);
         }
 
     }
@@ -267,7 +276,7 @@ public class StreamFile {
         int x2 = Integer.parseInt(record.get("CORNER.X"));
         int y2 = Integer.parseInt(record.get("CORNER.Y"));
         int color = Integer.parseInt(record.get("COLOR"));
-        renderer.addLine(x1, y1, x2, y2, color);
+        renderer.objects.add(new Line(x1, y1, x2, y2, color) );
     }
 
     public void addPolygon( Map<String, String> record) {

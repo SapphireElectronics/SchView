@@ -169,5 +169,13 @@ public abstract class Utility {
 
         return point;
     }
+
+    static public int altiumToRGB( int altColor )
+    {
+        int red = ( altColor & 0xff ) << 16;
+        int grn = altColor & 0xff00;
+        int blu = ( altColor & 0xff0000 ) >> 16;
+        return 0xff000000 | red | grn | blu;
+    }
 }
 

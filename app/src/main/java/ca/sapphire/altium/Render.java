@@ -3,16 +3,18 @@ package ca.sapphire.altium;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 
 import java.util.ArrayList;
+
+import ca.sapphire.graphics.GraphicsObject;
+import ca.sapphire.schview.StreamFile;
 
 /**
  * Created by apreston on 8/4/2015.
  */
 public class Render {
     public ArrayList<GraphicsObject> objects = new ArrayList<>();
-
+    public ArrayList<Object> altiumObjects = new ArrayList<>();
     public ArrayList<Font> fonts = new ArrayList<>();
 
     public void draw(Canvas canvas, Paint paint) {
@@ -20,13 +22,20 @@ public class Render {
             object.draw( canvas, paint );
     }
 
-    public void addLine(Point start, Point end, int color) {
-        objects.add( new Line(start.x, start.y, end.x, end.y, color));
+    public void render( Render renderer )
+    {
+        for( Object altiumObject : altiumObjects ) {
+            altiumObject.render( renderer );
+        }
     }
 
-    public void addLine( int x1, int y1, int x2, int y2, int color ) {
-        objects.add( new Line( x1, y1, x2, y2, color));
-    }
+//    public void addLine(Point start, Point end, int color) {
+//        objects.add( new Line(start.x, start.y, end.x, end.y, color));
+//    }
+//
+//    public void addLine( int x1, int y1, int x2, int y2, int color ) {
+//        objects.add( new Line( x1, y1, x2, y2, color));
+//    }
 
     public void addFont(int size, String name) {
         fonts.add( new Font(size, name) );
@@ -48,24 +57,24 @@ public class Render {
         objects.add( new Text( x, y, fontId, name ));
     }
 
-    public class Line implements GraphicsObject {
-        public int x1,y1,x2,y2,color;
-
-        public Line() {}
-
-        public Line( int x1, int y1, int x2, int y2, int color ) {
-            this.x1 = x1;
-            this.y1 = -y1;
-            this.x2 = x2;
-            this.y2 = -y2;
-            this.color = color;
-        }
-
-        public void draw( Canvas canvas, Paint paint ) {
-            paint.setColor( altiumToRGB(color) );
-            canvas.drawLine(x1, y1, x2, y2, paint);
-        }
-    }
+//    public class Line implements GraphicsObject {
+//        public int x1,y1,x2,y2,color;
+//
+//        public Line() {}
+//
+//        public Line( int x1, int y1, int x2, int y2, int color ) {
+//            this.x1 = x1;
+//            this.y1 = -y1;
+//            this.x2 = x2;
+//            this.y2 = -y2;
+//            this.color = color;
+//        }
+//
+//        public void draw( Canvas canvas, Paint paint ) {
+//            paint.setColor( altiumToRGB(color) );
+//            canvas.drawLine(x1, y1, x2, y2, paint);
+//        }
+//    }
 
     public class Circle implements GraphicsObject {
         public int x,y,radius,color;

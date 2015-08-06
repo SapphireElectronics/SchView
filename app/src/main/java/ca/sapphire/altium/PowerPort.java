@@ -1,20 +1,24 @@
 package ca.sapphire.altium;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 
 import java.io.Serializable;
 import java.util.Map;
 
+import ca.sapphire.graphics.Line;
+
 /**
  * Contains an Altium Power Port object
  */
 public class PowerPort implements Object, Serializable {
-    int x, y, color;
+    int x, y, color, xs[], xe[], ys[], ye[];
     byte style, rotation, fontId;
     boolean hidden, locked;
     String name;
 
-    public PowerPort( Map<String, String> record, Render renderer ) {
+    public PowerPort( Map<String, String> record ) {
         x = Utility.getIntValue(record, "LOCATION.X");
         y = Utility.getIntValue(record, "LOCATION.Y");
         color = Utility.getIntValue(record, "COLOR");
@@ -24,7 +28,8 @@ public class PowerPort implements Object, Serializable {
         hidden = !Utility.getBooleanValue(record, "SHOWNETNAME");
         locked = Utility.getBooleanValue(record, "GRAPHICALLYLOCKED", false);
         name = record.get( "TEXT");
-        render( renderer );
+
+
     }
 
     /**
@@ -68,10 +73,16 @@ public class PowerPort implements Object, Serializable {
                 for( Point point : points )
                     Utility.rotate( point, points[0], rotation );
 
-                renderer.addLine( points[0], points[1], color );
-                renderer.addLine( points[2], points[3], color );
-                renderer.addLine( points[3], points[4], color );
-                renderer.addLine( points[4], points[2], color );
+                renderer.objects.add( new Line( points[0], points[1], color));
+                renderer.objects.add( new Line( points[2], points[3], color));
+                renderer.objects.add( new Line( points[3], points[4], color));
+                renderer.objects.add( new Line( points[4], points[2], color));
+
+//                renderer.objects.add( new Line( points[0], points[1], color));
+//                renderer.objects.add( new Line( points[2], points[3], color));
+//                renderer.objects.add( new Line( points[3], points[4], color));
+//                renderer.objects.add( new Line( points[4], points[2], color));
+
                 break;
 
             default:
@@ -85,9 +96,15 @@ public class PowerPort implements Object, Serializable {
                 for( Point point : points )
                     Utility.rotate( point, points[0], rotation );
 
-                renderer.addLine( points[0], points[1], color );
-                renderer.addLine( points[2], points[3], color );
+                renderer.objects.add( new Line( points[0], points[1], color));
+                renderer.objects.add( new Line( points[2], points[3], color));
+
                 break;
         }
+    }
+
+    public void draw( Canvas canvas, Paint paint ) {
+        paint.setColor( color );
+
     }
 }
