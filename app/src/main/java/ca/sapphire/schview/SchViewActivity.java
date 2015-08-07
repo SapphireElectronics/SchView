@@ -210,16 +210,32 @@ public class SchViewActivity extends Activity {
         }
 
         protected void onDraw(Canvas canvas) {
-            super.onDraw( canvas );
+            super.onDraw(canvas);
 
             Log.i(TAG, "Drawing.");
             paint.setColor(Color.RED);
-            canvas.translate( 0, 800 );
+            canvas.translate(50, 800);
 //            cf.sf.renderer.draw( canvas, paint );
 
             for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+                object.render();
                 object.draw( canvas, paint );
             }
+
+//            paint.setColor( 0xffff0000 );
+//            canvas.drawLine(-500, -500, 500, 500, paint);
+//            canvas.drawLine( 500, -500, -500, 500, paint);
+//
+//            canvas.drawLine( -500, -500, -500, 500, paint );
+//            canvas.drawLine( -500, 500, 500, 500, paint );
+//            canvas.drawLine( 500, 500, 500, -500, paint );
+//            canvas.drawLine( 500, -500, -500, -500, paint );
+//
+//            canvas.drawLine( 500, 0, -500, 0, paint );
+//            canvas.drawLine( 0, 500, 0, -500, paint );
+//
+//            paint.setColor( 0xff00ff00 );
+//            canvas.drawCircle( 500, -500, 50, paint );
         }
     }
 }

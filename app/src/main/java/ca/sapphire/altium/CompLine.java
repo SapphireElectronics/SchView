@@ -11,34 +11,37 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * Contains an Altium Wire multisegment object
+ * Contains an Altium Component Line multisegment object
  */
-// Todo: Add line width
-public class Wire implements Object, Serializable {
-    int color;
-    Point point[];
+public class CompLine implements Object, Serializable {
+    int x1, y1, x2, y2, color;
 
-    public Wire( Map<String, String> record ) {
-        point = Utility.addMultiLine(record);
+    public CompLine( Map<String, String> record ) {
+        x1 = Integer.parseInt(record.get("LOCATION.X"));
+        y1 = Integer.parseInt(record.get("LOCATION.Y"));
+        x2 = Integer.parseInt(record.get("CORNER.X"));
+        y2 = Integer.parseInt(record.get("CORNER.Y"));
         color = Utility.getColor(record);
     }
 
+
+
     @Override
     public void read(DataInputStream dis) throws IOException {
+
     }
 
     @Override
     public void write(DataOutputStream dos) throws IOException {
+
     }
 
     @Override
-    public void render() {
-    }
+    public void render() {}
 
     public void draw( Canvas canvas, Paint paint ) {
         paint.setColor( color );
-        for (int i = 0; i < point.length-1; i++)
-            canvas.drawLine( point[i].x, -point[i].y, point[i+1].x, -point[i+1].y, paint );
+        canvas.drawLine( x1, -y1, x2, -y2, paint );
     }
 
 }

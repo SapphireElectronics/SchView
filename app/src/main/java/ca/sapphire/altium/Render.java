@@ -22,13 +22,6 @@ public class Render {
             object.draw( canvas, paint );
     }
 
-    public void render( Render renderer )
-    {
-        for( Object altiumObject : altiumObjects ) {
-            altiumObject.render( renderer );
-        }
-    }
-
 //    public void addLine(Point start, Point end, int color) {
 //        objects.add( new Line(start.x, start.y, end.x, end.y, color));
 //    }
@@ -41,9 +34,9 @@ public class Render {
         fonts.add( new Font(size, name) );
     }
 
-    public void addText( String text, int x, int y, int fontId, int color) {
-        objects.add( new Text( x, y, fontId, text ) );
-    }
+//    public void addText( String text, int x, int y, int fontId, int color) {
+//        objects.add( new Text( x, y, fontId, text ) );
+//    }
 
     public void addCircle( int x, int y, int radius, int color ) {
         objects.add( new Circle( x, y, radius, color ) );
@@ -53,9 +46,9 @@ public class Render {
         objects.add( new Polygon( x, y, color, filled ));
     }
 
-    public void addText( int x, int y, int fontId, String name ) {
-        objects.add( new Text( x, y, fontId, name ));
-    }
+//    public void addText( int x, int y, int fontId, String name ) {
+//        objects.add( new Text( x, y, fontId, name ));
+//    }
 
 //    public class Line implements GraphicsObject {
 //        public int x1,y1,x2,y2,color;

@@ -18,7 +18,6 @@ public interface Object {
      * Does all pre-calculations and stores the generated data for later fast drawing.
      */
     void render();
-    void render( Render renderer );
 
     /**
      * Draws the object to the Canvas using the Paint object

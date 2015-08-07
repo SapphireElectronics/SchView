@@ -1,8 +1,14 @@
 package ca.sapphire.altium;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PointF;
 
 import java.util.Map;
+
+import ca.sapphire.graphics.GraphicsObject;
 
 /**
  * Utilities for extracting data from Altium files
@@ -102,6 +108,12 @@ public abstract class Utility {
         return Integer.parseInt(record.get(name));
     }
 
+    static public int getColor( Map<String, String> record ) {
+        return altiumToRGB(Integer.parseInt(record.get("COLOR")));
+    }
+
+
+
     /**
      * Rotate a point around the origin
      *
@@ -112,6 +124,33 @@ public abstract class Utility {
         switch( rotation ) {
             case 1:
                 int tmp = src.x;
+                src.x = -src.y;
+                src.y = tmp;
+                return;
+
+            case 2:
+                src.x = -src.x;
+                src.y = -src.y;
+                return;
+
+            case 3:
+                tmp = src.x;
+                src.x = src.y;
+                src.y = -tmp;
+                return;
+        }
+    }
+
+    /**
+     * Rotate a point around the origin
+     *
+     * @param src ; Source point
+     * @param rotation ; Rotation amount, 0=0', 1=90', 2=180', 3=270'
+     */
+    static public void rotate( PointF src, int rotation ) {
+        switch( rotation ) {
+            case 1:
+                float tmp = src.x;
                 src.x = -src.y;
                 src.y = tmp;
                 return;
@@ -157,6 +196,33 @@ public abstract class Utility {
         }
     }
 
+    /**
+     * Rotate a point around a specified point
+     *
+     * @param src ; Source point
+     * @param rotation ; Rotation amount, 0=0', 1=90', 2=180', 3=270'
+     */
+    static public void rotate( PointF src, PointF origin, int rotation ) {
+        float dx = src.x - origin.x;
+        float dy = src.y - origin.y;
+
+        switch( rotation ) {
+            case 1:
+                src.x = origin.x - dy;
+                src.y = origin.y + dx;
+                return;
+
+            case 2:
+                src.x = origin.x - dx;
+                src.y = origin.y - dy;
+                return;
+
+            case 3:
+                src.x = origin.x + dy;
+                src.y = origin.y - dx;
+                return;
+        }
+    }
     static public Point[] addMultiLine( Map<String, String> record) {
         int size = Integer.parseInt(record.get("LOCATIONCOUNT"));
         Point[] point = new Point[size];
@@ -177,5 +243,49 @@ public abstract class Utility {
         int blu = ( altColor & 0xff0000 ) >> 16;
         return 0xff000000 | red | grn | blu;
     }
+
+    static public Path polygon( Point[] point ) {
+        Path path = new Path();
+        path.moveTo( point[0].x, -point[0].y );
+        for (int i = 1; i < point.length; i++) {
+            path.lineTo( point[i].x, -point[i].y );
+        }
+        path.lineTo( point[0].x, -point[0].y );
+        return path;
+    }
+
+
+
+    public class Polygon implements GraphicsObject {
+        public Path path = new Path();
+        public int color;
+        public boolean filled;
+
+        public Polygon( int[] x, int[] y, int color, boolean filled )
+        {
+            this.color = color;
+            this.filled = filled;
+            path.moveTo(x[0], -y[0]);
+            for (int i = 1; i < x.length; i++) {
+                path.lineTo( x[i], -y[i] );
+            }
+            path.lineTo(x[0], -y[0]);
+        }
+
+        public void draw( Canvas canvas, Paint paint ) {
+            paint.setColor( altiumToRGB(color));
+            if( filled ) {
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawPath(path, paint);
+            }
+            else {
+                paint.setStyle(Paint.Style.STROKE);
+                canvas.drawPath(path, paint);
+            }
+        }
+    }
+
+
+
 }
 

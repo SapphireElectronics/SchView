@@ -3,6 +3,7 @@ package ca.sapphire.altium;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PointF;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,20 +25,20 @@ public class PowerPort implements Object, Serializable {
     String name;
 
     // data for rendering
-    float[] linepts;
-    float[] circlePts;
+    PointF[] linepts;
+    PointF[] circlePts;
     float textSize;
 
     public PowerPort( Map<String, String> record ) {
         x = Utility.getIntValue(record, "LOCATION.X");
         y = Utility.getIntValue(record, "LOCATION.Y");
-        color = Utility.getIntValue(record, "COLOR");
-        style = Utility.getByteValue(record, "STYLE", (byte) 0 );
+        color = Utility.getColor(record);
+        style = Utility.getByteValue(record, "STYLE", (byte) 0);
         rotation = Utility.getByteValue(record, "ORIENTATION", (byte) 0);
         fontId = Utility.getByteValue(record, "FONTID", (byte) 1);
         hidden = !Utility.getBooleanValue(record, "SHOWNETNAME");
         locked = Utility.getBooleanValue(record, "GRAPHICALLYLOCKED", false);
-        name = record.get( "TEXT");
+        name = record.get("TEXT");
     }
 
     public void read( DataInputStream dis ) throws IOException {
@@ -88,68 +89,48 @@ public class PowerPort implements Object, Serializable {
      */
 
     public void render() {
-//        fontSize = fonts.get( fontId ).size
-
-    }
-
-    public void render( Render renderer ) {
         // TODO: Add all rendering types
         // TODO: Fix text rendering location
         // Currently only renders bar, arrow without text
 
-        //renderer.addText(name, x, y, fontId, color);
-
-//        textSize = renderer.fonts.get( fontId ).size;
         textSize = Options.INSTANCE.fontSize[fontId];
 
         switch( style ) {
-            case 1:
-                Point[] points = new Point[5];
+            case 1: // Arrow
+                linepts = new PointF[8];
 
-                points[0] = new Point( x, y );
-                points[1] = new Point( x+4, y );
-                points[2] = new Point( x+4, y-3 );
-                points[3] = new Point( x+4, y+3 );
-                points[4] = new Point( x+10, y );
-
-                for( Point point : points )
-                    Utility.rotate( point, points[0], rotation );
-
-                renderer.objects.add( new Line( points[0], points[1], color));
-                renderer.objects.add( new Line( points[2], points[3], color));
-                renderer.objects.add( new Line( points[3], points[4], color));
-                renderer.objects.add( new Line( points[4], points[2], color));
-
-//                renderer.objects.add( new Line( points[0], points[1], color));
-//                renderer.objects.add( new Line( points[2], points[3], color));
-//                renderer.objects.add( new Line( points[3], points[4], color));
-//                renderer.objects.add( new Line( points[4], points[2], color));
+                linepts[0] = new PointF( x, y );
+                linepts[1] = new PointF( x+4, y );
+                linepts[2] = new PointF( x+4, y-3 );
+                linepts[3] = new PointF( x+4, y+3 );
+                linepts[4] = new PointF( x+4, y+3 );
+                linepts[5] = new PointF( x+10, y );
+                linepts[6] = new PointF( x+10, y );
+                linepts[7] = new PointF( x+4, y-3 );
 
                 break;
 
-            default:
-                points = new Point[4];
+            default:    // bar
+                linepts = new PointF[4];
 
-                points[0] = new Point( x, y );
-                points[1] = new Point( x+10, y );
-                points[2] = new Point( x+10, y-5 );
-                points[3] = new Point( x+10, y+5 );
-
-                for( Point point : points )
-                    Utility.rotate( point, points[0], rotation );
-
-                renderer.objects.add( new Line( points[0], points[1], color));
-                renderer.objects.add( new Line( points[2], points[3], color));
+                linepts[0] = new PointF( x, y );
+                linepts[1] = new PointF( x+10, y );
+                linepts[2] = new PointF( x+10, y-5 );
+                linepts[3] = new PointF( x+10, y+5 );
 
                 break;
         }
+        for( PointF point : linepts )
+            Utility.rotate( point, linepts[0], rotation );
     }
 
     public void draw(Canvas canvas, Paint paint) {
         paint.setColor(color);
         paint.setTextSize(textSize);
-        canvas.drawText(name, x, y, paint);
+        canvas.drawText(name, x, -y, paint);
 
-
+        for (int i = 0; i < linepts.length; i+=2) {
+            canvas.drawLine( linepts[i].x, -linepts[i].y, linepts[i+1].x, -linepts[i+1].y, paint );
+        }
     }
 }
