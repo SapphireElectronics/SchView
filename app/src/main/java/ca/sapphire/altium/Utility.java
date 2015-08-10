@@ -66,29 +66,6 @@ public abstract class Utility {
      *
      * @param record : Data record
      * @param name : Name of parameter to extract
-     * @return : Short value of parameter
-     */
-    static public short getShortValue( Map<String, String> record, String name  ) {
-        return Short.parseShort(record.get(name));
-    }
-
-    /**
-     *
-     * @param record : Data record
-     * @param name : Name of parameter to extract
-     * @param defValue ; Default value to return if parameter does not exist in the record
-     * @return : Short value of parameter
-     */
-    static public short getShortValue( Map<String, String> record, String name, short defValue  ) {
-        if( record.get( name ) == null )
-            return defValue;
-        return Short.parseShort(record.get(name));
-    }
-
-    /**
-     *
-     * @param record : Data record
-     * @param name : Name of parameter to extract
      * @return : Integer value of parameter
      */
     static public int getIntValue( Map<String, String> record, String name  ) {
@@ -236,6 +213,18 @@ public abstract class Utility {
         return point;
     }
 
+    static public void xyToJava( Point[] points ) {
+        for (Point point : points ) {
+            point.y = -point.y;
+        }
+    }
+
+    static public void xyToJava( PointF[] points ) {
+        for (PointF point : points ) {
+            point.y = -point.y;
+        }
+    }
+
     static public int altiumToRGB( int altColor )
     {
         int red = ( altColor & 0xff ) << 16;
@@ -246,46 +235,12 @@ public abstract class Utility {
 
     static public Path polygon( Point[] point ) {
         Path path = new Path();
-        path.moveTo( point[0].x, -point[0].y );
+        path.moveTo( point[0].x, point[0].y );
         for (int i = 1; i < point.length; i++) {
-            path.lineTo( point[i].x, -point[i].y );
+            path.lineTo( point[i].x, point[i].y );
         }
-        path.lineTo( point[0].x, -point[0].y );
+        path.lineTo( point[0].x, point[0].y );
         return path;
     }
-
-
-
-    public class Polygon implements GraphicsObject {
-        public Path path = new Path();
-        public int color;
-        public boolean filled;
-
-        public Polygon( int[] x, int[] y, int color, boolean filled )
-        {
-            this.color = color;
-            this.filled = filled;
-            path.moveTo(x[0], -y[0]);
-            for (int i = 1; i < x.length; i++) {
-                path.lineTo( x[i], -y[i] );
-            }
-            path.lineTo(x[0], -y[0]);
-        }
-
-        public void draw( Canvas canvas, Paint paint ) {
-            paint.setColor( altiumToRGB(color));
-            if( filled ) {
-                paint.setStyle(Paint.Style.FILL);
-                canvas.drawPath(path, paint);
-            }
-            else {
-                paint.setStyle(Paint.Style.STROKE);
-                canvas.drawPath(path, paint);
-            }
-        }
-    }
-
-
-
 }
 
