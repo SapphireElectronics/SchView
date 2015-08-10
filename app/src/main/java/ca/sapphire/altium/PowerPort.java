@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -12,6 +13,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import ca.sapphire.graphics.Line;
+import ca.sapphire.graphics.Text;
+
 import ca.sapphire.altium.Options;
 
 /**
@@ -27,7 +30,9 @@ public class PowerPort implements Object, Serializable {
     // data for rendering
     PointF[] linepts;
     PointF[] circlePts;
+    PointF textpt;
     float textSize;
+    Text tag;
 
     public PowerPort( Map<String, String> record ) {
         x = Utility.getIntValue(record, "LOCATION.X");
@@ -93,7 +98,7 @@ public class PowerPort implements Object, Serializable {
         // TODO: Fix text rendering location
         // Currently only renders bar, arrow without text
 
-        textSize = Options.INSTANCE.fontSize[fontId];
+        textSize = Options.INSTANCE.fontSize[fontId-1];
 
         switch( style ) {
             case 1: // Arrow
@@ -108,6 +113,7 @@ public class PowerPort implements Object, Serializable {
                 linepts[6] = new PointF( x+10, y );
                 linepts[7] = new PointF( x+4, y-3 );
 
+                textpt = new PointF( x+10+5, y );
                 break;
 
             default:    // bar
@@ -118,16 +124,40 @@ public class PowerPort implements Object, Serializable {
                 linepts[2] = new PointF( x+10, y-5 );
                 linepts[3] = new PointF( x+10, y+5 );
 
+                textpt = new PointF( x+10+5, y );
                 break;
         }
         for( PointF point : linepts )
             Utility.rotate( point, linepts[0], rotation );
+
+        Utility.rotate( textpt, linepts[0], rotation );
+        textpt.y = -textpt.y;
+
+
+        switch( rotation ) {
+            case 0:
+                tag = new Text( name, textpt, color, Text.Halign.LEFT, Text.Valign.CENTER );
+                break;
+
+            case 1:
+                tag = new Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                break;
+
+            case 2:
+                tag = new Text( name, textpt, color, Text.Halign.RIGHT, Text.Valign.CENTER );
+                break;
+
+            case 3:
+                tag = new Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.TOP );
+                break;
+
+        }
     }
 
     public void draw(Canvas canvas, Paint paint) {
-        paint.setColor(color);
         paint.setTextSize(textSize);
-        canvas.drawText(name, x, -y, paint);
+        paint.setColor( color );
+        tag.draw( canvas, paint );
 
         for (int i = 0; i < linepts.length; i+=2) {
             canvas.drawLine( linepts[i].x, -linepts[i].y, linepts[i+1].x, -linepts[i+1].y, paint );

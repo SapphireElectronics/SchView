@@ -9,18 +9,24 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import ca.sapphire.graphics.Line;
+import ca.sapphire.graphics.*;
+import ca.sapphire.graphics.Text;
 
 /**
  * Created by Admin on 06/08/15.
  */
-public class Pin implements Object {
-    int x, y, length, designator, option, color;
+public class Pin extends SchBase implements Object {
+    int x, y, length, designator, option, color, fontId, textSize, orientation;
     String name;
 
     PointF pnt1, pnt2;
+    boolean drawable = true;
+    ca.sapphire.graphics.Text tag;
+    PointF textpt;
 
-    public Pin( Map<String, String> record ) {
+
+    public Pin( Map<String, String> record, boolean multiPartComponent  ) {
+        super(record);
         x = Utility.getIntValue(record, "LOCATION.X");
         y = Utility.getIntValue(record, "LOCATION.Y");
         length = Integer.parseInt(record.get("PINLENGTH"));
@@ -28,6 +34,15 @@ public class Pin implements Object {
         option = Integer.parseInt(record.get("PINCONGLOMERATE"));
 //        color = Utility.getColor(record);
         name = record.get("NAME");
+        if( name == null )
+            name = new String( "" );
+        fontId = Utility.getByteValue(record, "FONTID", (byte) 1);
+        orientation = option & 0x03;
+
+        if( multiPartComponent ) {
+            if( record.get("OWNERPARTDISPLAYMODE") != null)
+                drawable = false;
+        }
     }
 
     @Override
@@ -42,14 +57,45 @@ public class Pin implements Object {
 
     @Override
     public void render() {
+        if( !drawable )
+            return;
+
         pnt1 = new PointF( x, y );
-        pnt2 = new PointF(x+10, y );
-        Utility.rotate( pnt2, pnt1, option & 0x03 );
+        pnt2 = new PointF(x+length, y );
+        Utility.rotate( pnt2, pnt1, orientation );
         color = 0xff0000ff;
+
+        textSize = Options.INSTANCE.fontSize[fontId-1];
+
+        textpt = new PointF( x-5, y );
+        Utility.rotate( textpt, pnt1, orientation );
+        textpt.y = -textpt.y;
+
+        switch( orientation ) {
+            case 0:
+                tag = new Text( name, textpt, color, Text.Halign.RIGHT, Text.Valign.CENTER );
+                break;
+            case 1:
+                tag = new Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.TOP );
+                break;
+            case 2:
+                tag = new Text( name, textpt, color, Text.Halign.LEFT, Text.Valign.CENTER );
+                break;
+            case 3:
+                tag = new Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                break;
+        }
     }
 
     @Override
     public void draw(Canvas canvas, Paint paint) {
+        if( !drawable )
+            return;
+
+        paint.setColor( color );
         canvas.drawLine( pnt1.x, -pnt1.y, pnt2.x, -pnt2.y, paint );
+
+        paint.setTextSize(textSize);
+        tag.draw( canvas, paint );
     }
 }

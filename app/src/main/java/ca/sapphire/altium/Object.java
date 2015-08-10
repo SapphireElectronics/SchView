@@ -12,6 +12,7 @@ import java.util.Map;
  * Created by apreston on 8/4/2015.
  */
 public interface Object {
+    int recordNumber = -1;
     /**
      * Make the object ready for drawing.
      *

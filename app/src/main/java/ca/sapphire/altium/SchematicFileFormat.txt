@@ -1,0 +1,92 @@
+[1] Component: PartCount.
+    ^ [41] Attribute:
+    ^ [2] Pin: Name and location
+        ^ [41] Attribute: Pin unique ID
+    ^ [6] Multi Line
+    ^ [7] Polygon
+    ^ [12] Arc/Circle
+    ^ [13] Line Graphics
+    ^ [34] Designator
+    ^ [44] Next part??
+        ^ [45] Footprint
+            ^ [46]
+            ^ [48]
+                ^[41] Attribute
+
+[4] Text
+[17] Power Port
+[25] Net Name
+[27] Wire
+
+
+Notes
+- [1] Component:
+    If DISPLAYMODECOUNT=1, show all pins, lines and attached attributes etc.
+    If DISPLAYMODECOUNT>1, then only show pins, lines and attached attributes etc. with OWNERPARTDISPLAYMODE=1
+
+
+Enumerated List:
+    O = OWNERINDEX
+    I = INDEXINSHEET
+    P = OWNERPARTID
+    L = LOCATION.X/Y
+    C = COLOR
+    N = NAME
+    T = TEXT
+    H - ISHIDDEN
+    U = UNIQUEID
+    J = JUSTIFICATION
+    R = ORIENATION
+    F = FONTID
+    A = RADIUS, STARTANGLE, ENDANGLE
+    W = LINEWIDTH
+
+[##]    I   S
+[ 1] Component
+[ 2] Pin
+[ 3]
+[ 4] Text
+[ 5]
+[ 6] Component: Multiline
+[ 7] Component: Polygon
+[ 8]
+[ 9]
+[10]
+[11]
+[12] Component: Arc/Circle
+[13] Component: Lines
+[14] Component: Area
+[15]
+[16]
+[17] power Port
+[18]
+[19]
+[20]
+[21]
+[22]
+[23]
+[24]
+[25] Net Name
+[26] Bus
+[27] Wire
+[28]
+[29] Junction
+[30]
+[31] Options ??
+[32]
+[33]
+[34] Designator
+[35]
+[36]
+[37] Bus Entry
+[38]
+[39]
+[40]
+[41] Attribute
+[42]
+[43]
+[44] ??
+[45] ??
+[46] ??
+[47]
+[48] ??

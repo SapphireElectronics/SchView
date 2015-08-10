@@ -3,12 +3,9 @@ package ca.sapphire.schview;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +15,8 @@ import ca.sapphire.altium.Bus;
 import ca.sapphire.altium.CompLine;
 import ca.sapphire.altium.CompMultiLine;
 import ca.sapphire.altium.CompPoly;
+import ca.sapphire.altium.Component;
+import ca.sapphire.altium.Designator;
 import ca.sapphire.altium.Entry;
 import ca.sapphire.altium.Junction;
 import ca.sapphire.altium.Options;
@@ -26,7 +25,6 @@ import ca.sapphire.altium.PowerPort;
 import ca.sapphire.altium.Render;
 import ca.sapphire.altium.Text;
 import ca.sapphire.altium.Wire;
-import ca.sapphire.graphics.Line;
 
 /**
  * Created by apreston on 7/30/2015.
@@ -69,16 +67,14 @@ public class StreamFile {
     public final static String TAG = "StreamFile";
     BufferedInputStream bis;
     public List<Map<String, String>> records = new ArrayList<Map<String, String>>();
-    public int recordsRead = 0;
+    public int recordNumber = 0;
 //    public int fpr = 0;
 
     public Render renderer = new Render();
     public Options options;
 
-    public ArrayList<PowerPort> powerPorts = new ArrayList<>();
-    public ArrayList<Wire> wires = new ArrayList<>();
-
     public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
+    boolean multiPartComponent = false;
 
 
     public StreamFile(String fileName) {
@@ -95,7 +91,7 @@ public class StreamFile {
 
         }
 
-        Log.i(TAG, "Records read: " + recordsRead);
+        Log.i(TAG, "Records read: " + recordNumber);
 //        Log.i(TAG, "File pointer: " + fpr );
 
 //        // render all from Altium Objects to Graphics Objects
@@ -147,10 +143,16 @@ public class StreamFile {
             if (record.equals("4")||record.equals("9")||record.equals("10")||record.equals("11"))
                     Log.i("Record", result.toString());
 
-
             switch (Integer.parseInt(record)) {
+                case 1:
+                    Component component = new Component( result );
+                    objects.add( component );
+                    if( component.displayModeCount > 1)
+                        multiPartComponent = true;
+                    break;
                 case 2:
-                    objects.add( new Pin( result ));
+                    objects.add( new Pin( result, multiPartComponent ));
+
                     break;
                 case 4:
                     objects.add( new Text( result ));
@@ -162,13 +164,16 @@ public class StreamFile {
                     objects.add( new CompPoly( result ));
                     break;
                 case 13:
-                    objects.add( new CompLine( result ));
+                    objects.add( new CompLine( result, multiPartComponent ));
                     break;
                 case 14:
                     objects.add( new CompBox( result ));
                     break;
                 case 17:
                     objects.add( new PowerPort( result ) );
+                    break;
+                case 25:    // TODO: make new class
+                    objects.add( new Designator( result ));
                     break;
                 case 26:
                     objects.add( new Bus( result ));
@@ -182,6 +187,9 @@ public class StreamFile {
                 case 31:
                     options.INSTANCE.put( result );
                     break;
+                case 34:
+                    objects.add( new Designator( result ));
+                    break;
                 case 37:
                     objects.add( new Entry( result ));
                     break;
@@ -189,7 +197,7 @@ public class StreamFile {
         }
 
         line = null;
-        recordsRead++;
+        recordNumber++;
         return result;
     }
 
