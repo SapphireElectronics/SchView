@@ -7,10 +7,9 @@ import android.graphics.Path;
 import java.util.ArrayList;
 
 import ca.sapphire.graphics.GraphicsObject;
-import ca.sapphire.schview.StreamFile;
 
 /**
- * Created by apreston on 8/4/2015.
+ * Render
  */
 public class Render {
     public ArrayList<GraphicsObject> objects = new ArrayList<>();

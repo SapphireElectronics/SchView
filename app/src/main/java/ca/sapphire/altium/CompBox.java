@@ -10,9 +10,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import ca.sapphire.altium.*;
-import ca.sapphire.altium.Object;
-
 /**
  * Contains an Altium component filled body
  */

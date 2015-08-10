@@ -23,12 +23,11 @@ import ca.sapphire.altium.Junction;
 import ca.sapphire.altium.Options;
 import ca.sapphire.altium.Pin;
 import ca.sapphire.altium.PowerPort;
-import ca.sapphire.altium.Render;
 import ca.sapphire.altium.Text;
 import ca.sapphire.altium.Wire;
 
 /**
- * Created by apreston on 7/30/2015.
+ * Reads the schematic stream from an Altium file, stores it into Altium objects.
  */
 
 /**
@@ -36,7 +35,7 @@ import ca.sapphire.altium.Wire;
  *
  * Num	Imp	Name
  * 1  	N	Component ?? (loc x,y, color, areacolor
- * 2  	Y	Component Pin, TODO add pin types
+ * 2  	Y	Component Pin
  * 3    N   ???
  * 4    N   Text (loc x/y, text, fontid, color
  * 5    N   ???
@@ -51,7 +50,7 @@ import ca.sapphire.altium.Wire;
  * 14 	Y   Component box (loc x/y, cornerx/y, color, areacolor, transpartent t/f, issolid t/f (only draw if last two parts exist
  * 17   Y   Power Port: Implemented as an object
  * 25	N   Net label
- * 26	Y	Bus - multi segment line: LOCATIONCOUNT segments, X1,Y1 , X2,Y2 etc.  TODO bus width
+ * 26	Y	Bus - multi segment line: LOCATIONCOUNT segments, X1,Y1 , X2,Y2 etc.
  * 27 	Y	Wire
  * 29 	Y	Junction
  * 31   Y   Options: Implemented as an object
@@ -67,11 +66,10 @@ import ca.sapphire.altium.Wire;
 public class StreamFile {
     public final static String TAG = "StreamFile";
     BufferedInputStream bis;
-    public List<Map<String, String>> records = new ArrayList<Map<String, String>>();
+    public List<Map<String, String>> records = new ArrayList<>();
     public int recordNumber = 0;
 //    public int fpr = 0;
 
-    public Render renderer = new Render();
     public Options options;
 
     public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
@@ -120,7 +118,7 @@ public class StreamFile {
 
         if (line == null) return null;
 
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         String pairs[] = line.split("\\|");
 
@@ -173,7 +171,7 @@ public class StreamFile {
                 case 17:
                     objects.add( new PowerPort( result ) );
                     break;
-                case 25:    // TODO: make new class
+                case 25:
                     objects.add( new Designator( result ));
                     break;
                 case 26:
@@ -197,7 +195,7 @@ public class StreamFile {
             }
         }
 
-        line = null;
+//        line = null;
         recordNumber++;
         return result;
     }
