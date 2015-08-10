@@ -31,7 +31,6 @@ public enum Options implements Object {
         }
     }
 
-
     @Override
     public void draw( Canvas canvas, Paint paint ) {}
 

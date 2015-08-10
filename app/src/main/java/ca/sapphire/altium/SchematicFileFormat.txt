@@ -24,6 +24,14 @@ Notes
     If DISPLAYMODECOUNT=1, show all pins, lines and attached attributes etc.
     If DISPLAYMODECOUNT>1, then only show pins, lines and attached attributes etc. with OWNERPARTDISPLAYMODE=1
 
+Pin Electrical
+Pin Conglomerate
+0b--1dnvrr
+    ||||++  Orientation: 0=0', 1=90', 2=180', 3=270'
+    |||+--  Pin visibility: 0=show, 1=hide
+    ||+---  Pin name shown: 0=hide, 1-show
+    |+----  Pin number (designator) visibility: 0=hide, 1=show
+    +-----  Always seems to be set
 
 Enumerated List:
     O = OWNERINDEX

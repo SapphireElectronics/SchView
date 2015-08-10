@@ -70,8 +70,6 @@ public class StreamFile {
     public int recordNumber = 0;
 //    public int fpr = 0;
 
-    public Options options;
-
     public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
     boolean multiPartComponent = false;
 
@@ -103,9 +101,6 @@ public class StreamFile {
                 records.add(record);
             }
         }
-
-//        signature = (String) records.remove(0).get("HEADER");
-
         return !records.isEmpty();
     }
 
@@ -147,7 +142,6 @@ public class StreamFile {
                     break;
                 case 2:
                     objects.add( new Pin( result, multiPartComponent ));
-
                     break;
                 case 4:
                     objects.add( new Text( result ));
@@ -180,7 +174,7 @@ public class StreamFile {
                     objects.add( new Junction( result ));
                     break;
                 case 31:
-                    options.INSTANCE.put( result );
+                    Options.INSTANCE.put( result );
                     break;
                 case 34:
                     objects.add( new Designator( result ));
@@ -190,12 +184,9 @@ public class StreamFile {
                     break;
             }
         }
-
-//        line = null;
         recordNumber++;
         return result;
     }
-
 
     public String readLine() throws IOException {
         int length = readInt();
