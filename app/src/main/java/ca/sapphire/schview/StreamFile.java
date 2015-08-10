@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import ca.sapphire.altium.Bus;
+import ca.sapphire.altium.CompBox;
 import ca.sapphire.altium.CompLine;
 import ca.sapphire.altium.CompMultiLine;
 import ca.sapphire.altium.CompPoly;

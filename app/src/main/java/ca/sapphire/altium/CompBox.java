@@ -1,4 +1,4 @@
-package ca.sapphire.schview;
+package ca.sapphire.altium;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
