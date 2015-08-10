@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by apreston on 8/4/2015.
+ * Base class for an Altium Object
  */
 public interface Object {
     int recordNumber = -1;

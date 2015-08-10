@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by Admin on 07/08/15.
+ * Contains an Altium component
  */
 public class Component extends SchBase implements Object {
     public int displayModeCount;
@@ -20,22 +20,14 @@ public class Component extends SchBase implements Object {
     }
 
     @Override
-    public void read(DataInputStream dis) throws IOException {
-
-    }
+    public void draw(Canvas canvas, Paint paint) {}
 
     @Override
-    public void write(DataOutputStream dos) throws IOException {
-
-    }
+    public void render() {}
 
     @Override
-    public void render() {
-
-    }
+    public void read(DataInputStream dis) throws IOException {}
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
-
-    }
+    public void write(DataOutputStream dos) throws IOException {}
 }

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by Admin on 06/08/15.
+ * Contains an Altium Component polygon
  */
 public class CompPoly implements Object {
     int size, lineColor, areaColor;
@@ -25,22 +25,7 @@ public class CompPoly implements Object {
         lineColor = Utility.altiumToRGB(Integer.parseInt(record.get("COLOR")));
         areaColor = Utility.altiumToRGB( Integer.parseInt(record.get("AREACOLOR")) );
         point = Utility.addMultiLine(record);
-    }
-
-    @Override
-    public void read(DataInputStream dis) throws IOException {
-
-    }
-
-    @Override
-    public void write(DataOutputStream dos) throws IOException {
-
-    }
-
-    @Override
-    public void render() {
-        path = Utility.polygon( point );
-
+        Utility.xyToJava(point);
     }
 
     @Override
@@ -53,4 +38,15 @@ public class CompPoly implements Object {
         paint.setColor( lineColor );
         canvas.drawPath( path, paint );
     }
+
+    @Override
+    public void render() {
+        path = Utility.polygon( point );
+    }
+
+    @Override
+    public void read(DataInputStream dis) throws IOException {}
+
+    @Override
+    public void write(DataOutputStream dos) throws IOException {}
 }

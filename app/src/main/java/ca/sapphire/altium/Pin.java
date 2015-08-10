@@ -9,11 +9,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
-import ca.sapphire.graphics.*;
 import ca.sapphire.graphics.Text;
 
 /**
- * Created by Admin on 06/08/15.
+ * Contains an Altium pin
  */
 public class Pin extends SchBase implements Object {
     int x, y, length, designator, option, color, fontId, textSize, orientation;
@@ -24,18 +23,17 @@ public class Pin extends SchBase implements Object {
     ca.sapphire.graphics.Text tag;
     PointF textpt;
 
-
     public Pin( Map<String, String> record, boolean multiPartComponent  ) {
         super(record);
         x = Utility.getIntValue(record, "LOCATION.X");
-        y = Utility.getIntValue(record, "LOCATION.Y");
+        y = -Utility.getIntValue(record, "LOCATION.Y");
         length = Integer.parseInt(record.get("PINLENGTH"));
         designator = Integer.parseInt(record.get("DESIGNATOR"));
         option = Integer.parseInt(record.get("PINCONGLOMERATE"));
 //        color = Utility.getColor(record);
         name = record.get("NAME");
         if( name == null )
-            name = new String( "" );
+            name = "";
         fontId = Utility.getByteValue(record, "FONTID", (byte) 1);
         orientation = option & 0x03;
 
@@ -46,13 +44,15 @@ public class Pin extends SchBase implements Object {
     }
 
     @Override
-    public void read(DataInputStream dis) throws IOException {
+    public void draw(Canvas canvas, Paint paint) {
+        if( !drawable )
+            return;
 
-    }
+        paint.setColor( color );
+        canvas.drawLine( pnt1.x, pnt1.y, pnt2.x, pnt2.y, paint );
 
-    @Override
-    public void write(DataOutputStream dos) throws IOException {
-
+        paint.setTextSize(textSize);
+        tag.draw( canvas, paint );
     }
 
     @Override
@@ -69,7 +69,6 @@ public class Pin extends SchBase implements Object {
 
         textpt = new PointF( x-5, y );
         Utility.rotate( textpt, pnt1, orientation );
-        textpt.y = -textpt.y;
 
         switch( orientation ) {
             case 0:
@@ -88,14 +87,8 @@ public class Pin extends SchBase implements Object {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
-        if( !drawable )
-            return;
+    public void read(DataInputStream dis) throws IOException {}
 
-        paint.setColor( color );
-        canvas.drawLine( pnt1.x, -pnt1.y, pnt2.x, -pnt2.y, paint );
-
-        paint.setTextSize(textSize);
-        tag.draw( canvas, paint );
-    }
+    @Override
+    public void write(DataOutputStream dos) throws IOException {}
 }

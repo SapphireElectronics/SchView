@@ -1,14 +1,10 @@
 package ca.sapphire.altium;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 
 import java.util.Map;
-
-import ca.sapphire.graphics.GraphicsObject;
 
 /**
  * Utilities for extracting data from Altium files
@@ -92,7 +88,7 @@ public abstract class Utility {
 
 
     /**
-     * Rotate a point around the origin
+     * Rotate a point around the origin in Java space
      *
      * @param src ; Source point
      * @param rotation ; Rotation amount, 0=0', 1=90', 2=180', 3=270'
@@ -101,8 +97,8 @@ public abstract class Utility {
         switch( rotation ) {
             case 1:
                 int tmp = src.x;
-                src.x = -src.y;
-                src.y = tmp;
+                src.x = src.y;
+                src.y = -tmp;
                 return;
 
             case 2:
@@ -112,14 +108,14 @@ public abstract class Utility {
 
             case 3:
                 tmp = src.x;
-                src.x = src.y;
-                src.y = -tmp;
+                src.x = -src.y;
+                src.y = tmp;
                 return;
         }
     }
 
     /**
-     * Rotate a point around the origin
+     * Rotate a point around the origin in Java space
      *
      * @param src ; Source point
      * @param rotation ; Rotation amount, 0=0', 1=90', 2=180', 3=270'
@@ -128,8 +124,8 @@ public abstract class Utility {
         switch( rotation ) {
             case 1:
                 float tmp = src.x;
-                src.x = -src.y;
-                src.y = tmp;
+                src.x = src.y;
+                src.y = -tmp;
                 return;
 
             case 2:
@@ -139,14 +135,14 @@ public abstract class Utility {
 
             case 3:
                 tmp = src.x;
-                src.x = src.y;
-                src.y = -tmp;
+                src.x = -src.y;
+                src.y = tmp;
                 return;
         }
     }
 
     /**
-     * Rotate a point around a specified point
+     * Rotate a point around a specified point in Java space
      *
      * @param src ; Source point
      * @param rotation ; Rotation amount, 0=0', 1=90', 2=180', 3=270'
@@ -157,8 +153,8 @@ public abstract class Utility {
 
         switch( rotation ) {
             case 1:
-                src.x = origin.x - dy;
-                src.y = origin.y + dx;
+                src.x = origin.x + dy;
+                src.y = origin.y - dx;
                 return;
 
             case 2:
@@ -167,14 +163,14 @@ public abstract class Utility {
                 return;
 
             case 3:
-                src.x = origin.x + dy;
-                src.y = origin.y - dx;
+                src.x = origin.x - dy;
+                src.y = origin.y + dx;
                 return;
         }
     }
 
     /**
-     * Rotate a point around a specified point
+     * Rotate a point around a specified point in Java space
      *
      * @param src ; Source point
      * @param rotation ; Rotation amount, 0=0', 1=90', 2=180', 3=270'
@@ -185,8 +181,8 @@ public abstract class Utility {
 
         switch( rotation ) {
             case 1:
-                src.x = origin.x - dy;
-                src.y = origin.y + dx;
+                src.x = origin.x + dy;
+                src.y = origin.y - dx;
                 return;
 
             case 2:
@@ -195,8 +191,8 @@ public abstract class Utility {
                 return;
 
             case 3:
-                src.x = origin.x + dy;
-                src.y = origin.y - dx;
+                src.x = origin.x - dy;
+                src.y = origin.y + dx;
                 return;
         }
     }

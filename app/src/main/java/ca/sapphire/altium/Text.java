@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by Admin on 06/08/15.
+ * Contains an Altium text object
  */
 public class Text implements Object {
     int x, y, fontId, color;
@@ -17,23 +17,19 @@ public class Text implements Object {
 
     float textSize;
 
-
     public Text( Map<String, String> record ) {
         x = Integer.parseInt(record.get("LOCATION.X"));
-        y = Integer.parseInt(record.get("LOCATION.Y"));
+        y = -Integer.parseInt(record.get("LOCATION.Y"));
         fontId = Integer.parseInt(record.get("FONTID"));
         color = Utility.getColor(record);
         text = record.get("TEXT");
     }
 
     @Override
-    public void read(DataInputStream dis) throws IOException {
-
-    }
-
-    @Override
-    public void write(DataOutputStream dos) throws IOException {
-
+    public void draw(Canvas canvas, Paint paint) {
+        paint.setColor(color);
+        paint.setTextSize(textSize);
+        canvas.drawText(text, x, y, paint);
     }
 
     @Override
@@ -42,9 +38,8 @@ public class Text implements Object {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setColor(color);
-        paint.setTextSize(textSize);
-        canvas.drawText(text, x, -y, paint);
-    }
+    public void read(DataInputStream dis) throws IOException {}
+
+    @Override
+    public void write(DataOutputStream dos) throws IOException {}
 }

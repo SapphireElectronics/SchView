@@ -11,7 +11,7 @@ import java.util.Map;
  * Contains an Altium Options record
  */
 
-public enum Options {
+public enum Options implements Object {
     INSTANCE;
 
     byte fontCount, fontSize[], fontRotation[];
@@ -29,7 +29,7 @@ public enum Options {
             fontRotation[i] = Utility.getByteValue(record, "ROTATION" + String.valueOf(i + 1), (byte) 0);
             fontName[i] = record.get("FONTNAME" + String.valueOf(i + 1));
         }
-        render( renderer );
+//        render( renderer );
     }
 
     public void put( Map<String, String> record ) {
@@ -47,21 +47,21 @@ public enum Options {
     }
 
 
-    public void read( DataInputStream dis ) {
+    @Override
+    public void draw( Canvas canvas, Paint paint ) {}
 
-    }
+    @Override
+    public void read( DataInputStream dis ) {}
 
-    public void write( DataOutputStream dos ) {
+    @Override
+    public void write( DataOutputStream dos ) {}
 
-    }
-
-    public void render( Render renderer ) {
-        for (int i = 0; i < fontCount; i++) {
-            renderer.addFont(fontSize[i], fontName[i]);
-        }
-    }
-
+    @Override
     public void render() {}
 
-    public void draw( Canvas canvas, Paint paint ) {}
+//    public void render( Render renderer ) {
+//        for (int i = 0; i < fontCount; i++) {
+//            renderer.addFont(fontSize[i], fontName[i]);
+//        }
+//    }
 }

@@ -8,22 +8,22 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * Created by apreston on 8/6/2015.
+ * Contains an Altium component
  */
 public class Font implements Object {
-    public Font() {
+    public Font() {}
 
-    };
+    @Override
+    public void draw( Canvas canvas, Paint paint ) {}
 
-    public void read( DataInputStream dis ) throws IOException {
-    }
-
-    public void write( DataOutputStream dos ) throws IOException {
-    }
-
+    @Override
     public void render() {}
 
-    public void render( Render renderer ) {}
+    @Override
+    public void read( DataInputStream dis ) throws IOException {}
 
-    public void draw( Canvas canvas, Paint paint ) {}
+    @Override
+    public void write( DataOutputStream dos ) throws IOException {}
+
+
 }

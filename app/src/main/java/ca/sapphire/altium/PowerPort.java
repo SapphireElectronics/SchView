@@ -2,25 +2,19 @@ package ca.sapphire.altium;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Map;
 
-import ca.sapphire.graphics.Line;
 import ca.sapphire.graphics.Text;
-
-import ca.sapphire.altium.Options;
 
 /**
  * Contains an Altium Power Port object
  */
-public class PowerPort implements Object, Serializable {
+public class PowerPort implements Object {
     // data to read and write
     int x, y, color;
     byte style, rotation, fontId;
@@ -29,14 +23,14 @@ public class PowerPort implements Object, Serializable {
 
     // data for rendering
     PointF[] linepts;
-    PointF[] circlePts;
+//    PointF[] circlePts;
     PointF textpt;
     float textSize;
     Text tag;
 
     public PowerPort( Map<String, String> record ) {
         x = Utility.getIntValue(record, "LOCATION.X");
-        y = Utility.getIntValue(record, "LOCATION.Y");
+        y = -Utility.getIntValue(record, "LOCATION.Y");
         color = Utility.getColor(record);
         style = Utility.getByteValue(record, "STYLE", (byte) 0);
         rotation = Utility.getByteValue(record, "ORIENTATION", (byte) 0);
@@ -46,29 +40,15 @@ public class PowerPort implements Object, Serializable {
         name = record.get("TEXT");
     }
 
-    public void read( DataInputStream dis ) throws IOException {
-        x = dis.readInt();
-        y = dis.readInt();
-        color = dis.readInt();
-        style = dis.readByte();
-        rotation = dis.readByte();
-        fontId = dis.readByte();
-        hidden = dis.readBoolean();
-        locked = dis.readBoolean();
-        name = dis.readUTF();
-    }
+    @Override
+    public void draw(Canvas canvas, Paint paint) {
+        paint.setTextSize(textSize);
+        paint.setColor(color);
+        tag.draw(canvas, paint);
 
-    public void write( DataOutputStream dos ) throws IOException {
-        dos.writeInt( x );
-        dos.writeInt(y);
-        dos.writeInt(color);
-        dos.writeByte(style);
-        dos.writeByte(rotation);
-        dos.writeByte(fontId);
-        dos.writeBoolean(hidden);
-        dos.writeBoolean(locked);
-        dos.writeUTF( name );
-//        render( null );
+        for (int i = 0; i < linepts.length; i+=2) {
+            canvas.drawLine( linepts[i].x, linepts[i].y, linepts[i+1].x, linepts[i+1].y, paint );
+        }
     }
 
 
@@ -93,10 +73,10 @@ public class PowerPort implements Object, Serializable {
      * 3 = 270 degrees
      */
 
+    @Override
     public void render() {
         // TODO: Add all rendering types
-        // TODO: Fix text rendering location
-        // Currently only renders bar, arrow without text
+        // Currently only renders bar, arrow
 
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
@@ -130,9 +110,7 @@ public class PowerPort implements Object, Serializable {
         for( PointF point : linepts )
             Utility.rotate( point, linepts[0], rotation );
 
-        Utility.rotate( textpt, linepts[0], rotation );
-        textpt.y = -textpt.y;
-
+        Utility.rotate(textpt, linepts[0], rotation);
 
         switch( rotation ) {
             case 0:
@@ -144,7 +122,7 @@ public class PowerPort implements Object, Serializable {
                 break;
 
             case 2:
-                tag = new Text( name, textpt, color, Text.Halign.RIGHT, Text.Valign.CENTER );
+                tag = new Text(name, textpt, color, Text.Halign.RIGHT, Text.Valign.CENTER);
                 break;
 
             case 3:
@@ -154,13 +132,31 @@ public class PowerPort implements Object, Serializable {
         }
     }
 
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setTextSize(textSize);
-        paint.setColor( color );
-        tag.draw( canvas, paint );
 
-        for (int i = 0; i < linepts.length; i+=2) {
-            canvas.drawLine( linepts[i].x, -linepts[i].y, linepts[i+1].x, -linepts[i+1].y, paint );
-        }
+    @Override
+    public void read( DataInputStream dis ) throws IOException {
+        x = dis.readInt();
+        y = dis.readInt();
+        color = dis.readInt();
+        style = dis.readByte();
+        rotation = dis.readByte();
+        fontId = dis.readByte();
+        hidden = dis.readBoolean();
+        locked = dis.readBoolean();
+        name = dis.readUTF();
+    }
+
+    @Override
+    public void write( DataOutputStream dos ) throws IOException {
+        dos.writeInt( x );
+        dos.writeInt(y);
+        dos.writeInt(color);
+        dos.writeByte(style);
+        dos.writeByte(rotation);
+        dos.writeByte(fontId);
+        dos.writeBoolean(hidden);
+        dos.writeBoolean(locked);
+        dos.writeUTF( name );
+//        render( null );
     }
 }
