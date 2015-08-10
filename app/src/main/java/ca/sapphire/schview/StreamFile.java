@@ -93,10 +93,6 @@ public class StreamFile {
         Log.i(TAG, "Records read: " + recordNumber);
 //        Log.i(TAG, "File pointer: " + fpr );
 
-//        // render all from Altium Objects to Graphics Objects
-//        for( ca.sapphire.altium.Object object : objects ) {
-//            object.render( renderer );
-//        }
     }
 
     public boolean load() throws IOException {
