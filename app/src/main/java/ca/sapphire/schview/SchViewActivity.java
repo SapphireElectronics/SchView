@@ -1,5 +1,17 @@
 package ca.sapphire.schview;
 
+/**
+ * Todo: rework file reader to avoid temporary file
+ * Todo: add component value field
+ * Todo: make basic and advanced versions (for distribution) based on what is viewed
+ * Todo: add selectable input file
+ * Todo: add viewing controls
+ * Todo: add title border and title block
+ * Todo: add visible grid ??
+ */
+
+
+import ca.sapphire.altium.Options;
 import ca.sapphire.schview.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -218,7 +230,9 @@ public class SchViewActivity extends Activity {
 //            cf.sf.renderer.draw( canvas, paint );
 
             for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+                Options.INSTANCE.render();
                 object.render();
+                Options.INSTANCE.draw( canvas, paint );
                 object.draw( canvas, paint );
             }
 

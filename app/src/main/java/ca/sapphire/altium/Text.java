@@ -34,7 +34,7 @@ public class Text implements Object {
 
     @Override
     public void render() {
-        textSize = Options.INSTANCE.fontSize[fontId];
+        textSize = Options.INSTANCE.fontSize[fontId-1];
     }
 
     @Override
