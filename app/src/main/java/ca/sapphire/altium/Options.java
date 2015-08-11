@@ -7,6 +7,8 @@ import android.graphics.PointF;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import ca.sapphire.graphics.Text;
@@ -73,46 +75,100 @@ public enum Options implements Object {
 
     @Override
     public void draw( Canvas canvas, Paint paint ) {
-        paint.setColor(0xffc0c0c0);
-        paint.setStrokeWidth(0);
-        canvas.drawLine(0, 0, xSheet, 0, paint);
-        canvas.drawLine(xSheet, 0, xSheet, ySheet, paint);
-        canvas.drawLine( 0, ySheet, 0, ySheet, paint );
-        canvas.drawLine( 0, ySheet, 0, 0, paint );
-        canvas.drawLine( xMargin, yMargin, xSheet-xMargin, yMargin, paint );
-        canvas.drawLine( xSheet-xMargin, yMargin, xSheet-xMargin, ySheet-xMargin, paint );
-        canvas.drawLine( xSheet-xMargin, ySheet-yMargin, xMargin, ySheet-yMargin, paint );
-        canvas.drawLine( xMargin, ySheet-yMargin, xMargin, yMargin, paint );
+        paint.setColor(0xff404040);
+        float z = -100000;
+
+//        paint.setStrokeWidth(0);
+
+//        canvas.drawLine(0, 0, xSheet, 0, paint);
+//        canvas.drawLine(xSheet, 0, xSheet, ySheet, paint);
+//        canvas.drawLine( 0, ySheet, 0, ySheet, paint );
+//        canvas.drawLine( 0, ySheet, 0, 0, paint );
+//        canvas.drawLine( xMargin, yMargin, xSheet-xMargin, yMargin, paint );
+//        canvas.drawLine( xSheet-xMargin, yMargin, xSheet-xMargin, ySheet-xMargin, paint );
+//        canvas.drawLine( xSheet-xMargin, ySheet-yMargin, xMargin, ySheet-yMargin, paint );
+//        canvas.drawLine( xMargin, ySheet-yMargin, xMargin, yMargin, paint );
+
+        index = 0;
+        pts = new float[4*(8+2*(xZones-1+yZones-1))];
+
+//        canvas.drawLine(0, 0, xSheet, 0, paint);
+//        canvas.drawLine(xSheet, 0, xSheet, ySheet, paint);
+//        canvas.drawLine( 0, ySheet, 0, ySheet, paint );
+//        canvas.drawLine( 0, ySheet, 0, 0, paint );
+//        canvas.drawLine( xMargin, yMargin, xSheet-xMargin, yMargin, paint );
+//        canvas.drawLine( xSheet-xMargin, yMargin, xSheet-xMargin, ySheet-xMargin, paint );
+//        canvas.drawLine( xSheet-xMargin, ySheet-yMargin, xMargin, ySheet-yMargin, paint );
+//        canvas.drawLine( xMargin, ySheet-yMargin, xMargin, yMargin, paint );
+
+        addLine(0, 0, xSheet, 0);
+        addLine(xSheet, 0, xSheet, ySheet);
+        addLine(0, ySheet, 0, ySheet);
+        addLine(0, ySheet, 0, 0);
+        addLine( xMargin, yMargin, xSheet-xMargin, yMargin);
+        addLine(xSheet - xMargin, yMargin, xSheet - xMargin, ySheet - xMargin);
+        addLine(xSheet - xMargin, ySheet - yMargin, xMargin, ySheet - yMargin);
+        addLine(xMargin, ySheet - yMargin, xMargin, yMargin);
+
+//        canvas.drawLines(new float[]{ z,z,z,z, 0, 0, xSheet, 0}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z, xSheet, 0, xSheet, ySheet}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z, 0, ySheet, 0, ySheet}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z,  0, ySheet, 0, 0}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z, xMargin, yMargin, xSheet-xMargin, yMargin}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z, xSheet - xMargin, yMargin, xSheet - xMargin, ySheet-xMargin}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z, xSheet - xMargin, ySheet - yMargin, xMargin, ySheet-yMargin}, paint);
+//        canvas.drawLines(new float[]{ z,z,z,z, xMargin, ySheet - yMargin, xMargin, yMargin}, paint );
+
 
         for (int i = 1; i < xZones; i++) {
             int xLoc = i*xSheet/xZones;
-            canvas.drawLine( xLoc, 0, xLoc, yMargin, paint );
-            canvas.drawLine( xLoc, ySheet, xLoc, ySheet-yMargin, paint );
+//            canvas.drawLine( xLoc, 0, xLoc, yMargin, paint );
+//            canvas.drawLine( xLoc, ySheet, xLoc, ySheet-yMargin, paint );
+//            canvas.drawLines( new float[]{ z,z,z,z, xLoc, 0, xLoc, yMargin}, paint );
+//            canvas.drawLines( new float[]{ z,z,z,z, xLoc, ySheet, xLoc, ySheet-yMargin}, paint );
+            addLine(xLoc, 0, xLoc, yMargin);
+            addLine(xLoc, ySheet, xLoc, ySheet - yMargin);
         }
         for (int i = 1; i < yZones; i++) {
             int yLoc = i*ySheet/yZones;
-            canvas.drawLine( 0, yLoc, xMargin, yLoc, paint );
-            canvas.drawLine( xSheet, yLoc, xSheet-xMargin, yLoc, paint );
+//            canvas.drawLine( 0, yLoc, xMargin, yLoc, paint );
+//            canvas.drawLine( xSheet, yLoc, xSheet-xMargin, yLoc, paint );
+//            canvas.drawLines( new float[]{z,z,z,z, 0, yLoc, xMargin, yLoc}, paint );
+//            canvas.drawLines( new float[]{z,z,z,z, xSheet, yLoc, xSheet-xMargin, yLoc}, paint );
+            addLine( 0, yLoc, xMargin, yLoc );
+            addLine( xSheet, yLoc, xSheet-xMargin, yLoc );
         }
+
+        canvas.drawLines( pts, paint );
+
+        paint.setTextSize( fontSize[0] );
 
         for (int i = 0; i < xZones; i++) {
             int xLoc = (2*i+1)*xSheet/(xZones*2);
-            Text tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, yMargin/2 ), 0xffc0c0c0, Text.Halign.CENTER, Text.Valign.CENTER );
+            Text tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, yMargin/2 ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw(canvas, paint);
-            tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, ySheet-yMargin/2 ), 0xffc0c0c0, Text.Halign.CENTER, Text.Valign.CENTER );
+            tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, ySheet-yMargin/2 ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw(canvas, paint);
         }
 
         for (int i = 0; i < yZones; i++) {
             int yLoc = (2*i+1)*ySheet/(yZones*2);
-//            String ch = new String( Character.toChars( i+1 ) );
-            String ch = new String( "*" );
-            Text tag = new Text( ch, new PointF( xMargin/2, yLoc ), 0xffc0c0c0, Text.Halign.CENTER, Text.Valign.CENTER );
+            String ch = Character.toString ((char) ((yZones-i)+64));
+            Text tag = new Text( ch, new PointF( xMargin/2, yLoc ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw( canvas, paint );
-            tag = new Text( ch, new PointF( xMargin-xMargin/2, yLoc ), 0xffc0c0c0, Text.Halign.CENTER, Text.Valign.CENTER );
+            tag = new Text( ch, new PointF( xMargin-xMargin/2, yLoc ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw(canvas, paint);
         }
+    }
 
+
+    float[] pts;
+    int index = 0;
+    public void addLine( float x1, float y1, float x2, float y2 ) {
+        pts[index++] = x1;
+        pts[index++] = y1;
+        pts[index++] = x2;
+        pts[index++] = y2;
     }
 
     @Override

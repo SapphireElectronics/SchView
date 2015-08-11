@@ -25,10 +25,11 @@ public class Bus implements Object {
     @Override
     public void draw(Canvas canvas, Paint paint) {
         paint.setColor( color );
+        float strokeWidth = paint.getStrokeWidth();
         paint.setStrokeWidth(3);
         for (int i = 0; i < point.length-1; i++)
             canvas.drawLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, paint );
-        paint.setStrokeWidth( 0 );
+        paint.setStrokeWidth( strokeWidth );
     }
 
     @Override

@@ -6,7 +6,7 @@ package ca.sapphire.schview;
  * Todo: make basic and advanced versions (for distribution) based on what is viewed
  * Todo: add selectable input file
  * Todo: add viewing controls
- * Todo: add title border and title block
+ * Todo: add title block
  * Todo: add visible grid ??
  */
 
@@ -228,6 +228,11 @@ public class SchViewActivity extends Activity {
             paint.setColor(Color.RED);
             canvas.translate(50, 800);
 //            cf.sf.renderer.draw( canvas, paint );
+
+            paint.setAntiAlias(false);
+            paint.setStrokeWidth(0);
+//            paint.setStrokeWidth(1 / getResources().getDisplayMetrics().density);
+            canvas.scale( 0.75F, 0.75F );
 
             for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
                 Options.INSTANCE.render();
