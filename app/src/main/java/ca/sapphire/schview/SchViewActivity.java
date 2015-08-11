@@ -214,32 +214,51 @@ public class SchViewActivity extends Activity {
     }
 
 //    public class Sch extends SurfaceView implements SurfaceHolder.Callback {
-    public class Sch extends View {
-        Paint paint = new Paint();
+public class Sch extends View {
+    float viewWidth, viewHeight;
+    float scale = -1;
+    Paint paint = new Paint();
 
-        public Sch( Context context ) {
-            super( context );
+    public Sch( Context context ) {
+        super( context );
+    }
+
+    @Override
+    protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld){
+        super.onSizeChanged(xNew, yNew, xOld, yOld);
+        viewWidth = xNew;
+        viewHeight = yNew;
+    }
+
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        Log.i(TAG, "Drawing.");
+
+        scale = Math.min(Math.abs(viewWidth / Options.INSTANCE.xSheet), Math.abs(viewHeight / Options.INSTANCE.ySheet));
+        Log.i(TAG, "Scale: " + scale);
+        canvas.scale(scale, scale);
+
+        canvas.translate(0, viewHeight / scale);
+//        canvas.translate(50, 800);
+
+        paint.setAntiAlias(false);
+        paint.setStrokeWidth(0);
+        paint.setDither(false);
+        paint.setStyle(Paint.Style.STROKE);
+
+        Options.INSTANCE.render( cf.sf.grEngine );
+
+        for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+            Options.INSTANCE.render();
+            object.render();
+            Options.INSTANCE.draw( canvas, paint );
+            object.draw( canvas, paint );
         }
 
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
+        cf.sf.grEngine.render();
+        cf.sf.grEngine.draw( canvas, paint );
 
-            Log.i(TAG, "Drawing.");
-            paint.setColor(Color.RED);
-            canvas.translate(50, 800);
-//            cf.sf.renderer.draw( canvas, paint );
-
-            paint.setAntiAlias(false);
-            paint.setStrokeWidth(0);
-//            paint.setStrokeWidth(1 / getResources().getDisplayMetrics().density);
-            canvas.scale( 0.75F, 0.75F );
-
-            for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
-                Options.INSTANCE.render();
-                object.render();
-                Options.INSTANCE.draw( canvas, paint );
-                object.draw( canvas, paint );
-            }
 
 //            paint.setColor( 0xffff0000 );
 //            canvas.drawLine(-500, -500, 500, 500, paint);
@@ -255,8 +274,8 @@ public class SchViewActivity extends Activity {
 //
 //            paint.setColor( 0xff00ff00 );
 //            canvas.drawCircle( 500, -500, 50, paint );
-        }
     }
+}
 }
 
 

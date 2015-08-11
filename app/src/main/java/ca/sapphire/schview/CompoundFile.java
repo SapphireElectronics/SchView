@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -23,12 +25,12 @@ public class CompoundFile {
 
     int[] sat;
 
-    ArrayList<byte[]> satSectors = new ArrayList<byte[]>();     // sector into for SAT
-    ArrayList<byte[]> dirSectors = new ArrayList<byte[]>();     // sector info for Directory
-    ArrayList<byte[]> shortSector = new ArrayList<byte[]>();    // sector info for Short SAT
+    ArrayList<byte[]> satSectors = new ArrayList<>();     // sector into for SAT
+    ArrayList<byte[]> dirSectors = new ArrayList<>();     // sector info for Directory
+//    ArrayList<byte[]> shortSector = new ArrayList<>();    // sector info for Short SAT
 
     ArrayList<Integer> dirID = new ArrayList<>();        // list of sectors in Directory stream
-    ArrayList<Integer> fileID = new ArrayList();                        // list of sectors in HeaderFile stream
+    ArrayList<Integer> fileID = new ArrayList<>();                        // list of sectors in HeaderFile stream
     ArrayList<Integer> dirTraverse = new ArrayList<>();  // list of directories compiled when traversing the directory tree
 
     int mainDataSecID;
@@ -167,7 +169,7 @@ public class CompoundFile {
 
         // make sure manifest allows write to external storage or this will fail.
         BufferedOutputStream bos = null;
-        String streamFileName = new String( fileName + ".str" );
+        String streamFileName = fileName + ".str";
         byte[] bf = new byte[sectorBytes];
 
         try {
@@ -182,7 +184,8 @@ public class CompoundFile {
         }
 
         try {
-            bos.close();
+            if( bos != null)
+                bos.close();
             raf.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -258,10 +261,16 @@ public class CompoundFile {
 
     public int getInt() {
         try {
-            if( littleEndian )
-                return (raf.read()&0xff) | (raf.read()&0xff << 8) | (raf.read()&0xff << 16) | (raf.read()&0xff << 24);
-            else
-                return (raf.read()&0xff << 24) | (raf.read()&0xff << 16) | (raf.read()&0xff << 8) | (raf.read()&0xff);
+            ByteBuffer bb = ByteBuffer.allocate(4);
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+            bb.putInt(raf.readInt());
+            bb.order(ByteOrder.BIG_ENDIAN);
+            return bb.getInt();
+
+//            if( littleEndian )
+//                return (raf.read()&0xff) | (raf.read()&0xff << 8) | (raf.read()&0xff << 16) | (raf.read()&0xff << 24);
+//            else
+//                return (raf.read()&0xff << 24) | (raf.read()&0xff << 16) | (raf.read()&0xff << 8) | (raf.read()&0xff);
         } catch (IOException e) {
             e.printStackTrace();
             return 0;
@@ -309,8 +318,6 @@ public class CompoundFile {
 
             if (!Arrays.equals(headerID, fileID)) {
                 Log.i(TAG, "Not a Compound Document File.  ID did not match.");
-                for (int i = 0; i < 8; i++)
-                    Log.i(TAG, "ID: " + i + (int) buffer[i]);
                 return -1;
             }
 
@@ -364,21 +371,45 @@ public class CompoundFile {
         }
 
         public void read( byte[] buffer, int index) {
-            getChars( buffer, index, nameChar, 32 );
-            nameSize = getShort( buffer, index + 64 );
+            ByteBuffer bb = ByteBuffer.wrap( buffer );
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+
+            getChars(buffer, index, nameChar, 32);
+
+            nameSize = bb.getShort( index+64 );
+
             name = new String( nameChar, 0, nameSize/2-1 );
-            type = buffer[index+66];
+
+            type = bb.get( index+66 );
 //            colour = buffer[index+67];
-            leftDirID = getInt( buffer, index+68 );
-            rightDirID = getInt( buffer, index+72 );
-            rootDirID = getInt( buffer, index+76 );
+            leftDirID = bb.getInt( index+68 );
+            rightDirID = bb.getInt( index+72 );
+            rootDirID = bb.getInt( index+76 );
 //            System.arraycopy( buffer, index+80, uniqueID, 0, 16 );
 //            flags = getInt( buffer, index+96 );
 //            System.arraycopy( buffer, index+100, timeStampCreation, 0, 8 );
 //            System.arraycopy( buffer, index+108, timeStampModification, 0, 8 );
-            sectorID = getInt( buffer, index+116 );
-            streamSize = getInt( buffer, index+120 );
+            sectorID = bb.getInt( index+116 );
+            streamSize = bb.getInt( index+120 );
             // total of 128 bytes
+
+
+
+//            getChars( buffer, index, nameChar, 32 );
+//            nameSize = getShort( buffer, index + 64 );
+//            name = new String( nameChar, 0, nameSize/2-1 );
+//            type = buffer[index+66];
+////            colour = buffer[index+67];
+//            leftDirID = getInt( buffer, index+68 );
+//            rightDirID = getInt( buffer, index+72 );
+//            rootDirID = getInt( buffer, index+76 );
+////            System.arraycopy( buffer, index+80, uniqueID, 0, 16 );
+////            flags = getInt( buffer, index+96 );
+////            System.arraycopy( buffer, index+100, timeStampCreation, 0, 8 );
+////            System.arraycopy( buffer, index+108, timeStampModification, 0, 8 );
+//            sectorID = getInt( buffer, index+116 );
+//            streamSize = getInt( buffer, index+120 );
+//            // total of 128 bytes
         }
     }
 }

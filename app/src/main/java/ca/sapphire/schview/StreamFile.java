@@ -25,6 +25,7 @@ import ca.sapphire.altium.Pin;
 import ca.sapphire.altium.PowerPort;
 import ca.sapphire.altium.Text;
 import ca.sapphire.altium.Wire;
+import ca.sapphire.graphics.GrEngine;
 
 /**
  * Reads the schematic stream from an Altium file, stores it into Altium objects.
@@ -72,6 +73,7 @@ public class StreamFile {
 
     public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
     boolean multiPartComponent = false;
+    public GrEngine grEngine = new GrEngine();
 
 
     public StreamFile(String fileName) {
