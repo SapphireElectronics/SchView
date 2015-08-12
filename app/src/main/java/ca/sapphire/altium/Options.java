@@ -36,6 +36,7 @@ public enum Options implements Object {
     int xZones = 0;
     int yZones = 0;
     int sheetStyle = 0;
+    int grid = 0;
     String fontName[];
 
     public void put( Map<String, String> record ) {
@@ -72,6 +73,8 @@ public enum Options implements Object {
             fontRotation[i] = Utility.getByteValue(record, "ROTATION" + String.valueOf(i + 1), (byte) 0);
             fontName[i] = record.get("FONTNAME" + String.valueOf(i + 1));
         }
+
+        grid = Utility.getIntValue( record, "VISIBLEGRIDSIZE", 0);
     }
 
     @Override
@@ -122,5 +125,12 @@ public enum Options implements Object {
             engine.addLine(0, yLoc, xMargin, yLoc, color);
             engine.addLine(xSheet, yLoc, xSheet - xMargin, yLoc, color);
         }
+
+//        if( grid > 0 ) {
+//            color = 0xffc0c0c0;
+//            for (int i = xMargin+grid; i <= (xSheet-xMargin)-grid; i+=grid) {
+//                engine.addLine( i, yMargin, i, ySheet-yMargin, color );
+//            }
+//        }
     }
 }

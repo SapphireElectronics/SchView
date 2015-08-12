@@ -7,7 +7,24 @@ package ca.sapphire.schview;
  * Todo: add selectable input file
  * Todo: add viewing controls
  * Todo: add title block
- * Todo: add visible grid ??
+ * Todo: add visible grid ?? - have to draw grid before other objects
+ *
+ * Restructure operations:
+ *
+ * Presently
+ * - The compound file is opened.
+ * - Sector list is generated for the data file.
+ * - The data file is written to the sdcard. (A)
+ * - The data file is read back in from the sdcard.
+ * - Each record is stored as it's processed.  (B)
+ * - For each record, the Altium values are loaded into a class.  (C)
+ * - Each drawable element is saved.  (D)
+ * - Therefore in essense, we're keeping four copies of the data, A, B, C, D.
+ *
+ * A can be eliminated if we directly read from the sector list.
+ * B can be eliminated as it's strictly not needed, we can parse the current record, then discard it.
+ * C can be reduced unless we intend to use the data in an editor (so comment the code, only keep what is needed for rendering.)
+ * D is of course what we need to save in a quickly renderable format in the graphics engine.
  */
 
 

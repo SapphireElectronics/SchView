@@ -30,10 +30,6 @@ public class Attribute extends SchBase implements Object {
         y = -Utility.getIntValue(record, "LOCATION.Y", 0);
         color = Utility.getColor(record);
         name = record.get("TEXT");
-        if( name != null)
-            if( name.equals( "1K")) {
-                Log.i("", "Name=1k");
-            }
         justification = Utility.getIntValue(record, "JUSTIFICATION", 0);
         orientation = Utility.getIntValue( record, "ORIENTATION", 0);
         fontId = Utility.getByteValue(record, "FONTID", (byte) 1);
@@ -42,10 +38,6 @@ public class Attribute extends SchBase implements Object {
 
     @Override
     public void draw(Canvas canvas, Paint paint) {
-        if( name != null)
-            if( name.equals( "1K")) {
-                Log.i("", "Name=1k");
-            }
         if( hidden )
             return;
         paint.setTextSize(textSize);
@@ -55,10 +47,6 @@ public class Attribute extends SchBase implements Object {
 
     @Override
     public void render() {
-        if( name != null)
-            if( name.equals( "1K")) {
-                Log.i("", "Name=1k");
-            }
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
         textpt = new PointF( x, y );
