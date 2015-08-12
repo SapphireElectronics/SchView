@@ -61,7 +61,6 @@ public class CompoundFile {
             return;
         }
 
-
         Log.i( TAG, "Total sectors: " + header.numberOfSectors );
         Log.i( TAG, "Total short sectors: " + header.numberOfShortSectors );
         Log.i( TAG, "Total sectors in table: " + header.masterNumberOfSectors );
@@ -70,14 +69,12 @@ public class CompoundFile {
         Log.i( TAG, "Short sector: " + header.shortSectorID );
         Log.i( TAG, "Master sector: " + header.masterSectorID );
 
-
         // Read MSAT
         // currently only 109 entries are supported (entries are stored in Header)
         if( header.numberOfSectors > 109 || header.masterSectorID != -2 ) {
             Log.i( TAG, "Too many Master Sectors to read.");
             return;
         }
-
 
         // Read sectors
         sectorBytes = 1 << header.sectorSize;
@@ -106,7 +103,6 @@ public class CompoundFile {
             satSectors.add( newSector );
         }
 
-
         Log.i(TAG, "Read in " + header.numberOfSectors + " sectors.");
 
         // Read SAT
@@ -114,15 +110,14 @@ public class CompoundFile {
         sat = new int[sectorBytes/4*satSectors.size()];
 
         for (int j = 0; j < satSectors.size(); j++) {
-            byte[] satBuffer = satSectors.get(j);
+            ByteBuffer satBuffer = ByteBuffer.wrap(satSectors.get(j));
+            satBuffer.order( ByteOrder.LITTLE_ENDIAN );
             for (int i = 0; i < sectorBytes / 4; i++) {
-                sat[i+j*sectorBytes/4] = getInt(satBuffer, i * 4);
+                sat[i+j*sectorBytes/4] = satBuffer.getInt(i*4);
             }
         }
 
-
         // Read SSAT
-
 
         // Read Directory
         // Walk the Directory chain in the SAT until we get the value -2
@@ -237,64 +232,6 @@ public class CompoundFile {
             e.printStackTrace();
             Log.i(TAG, "readNextSector: unable to read in a full sector.");
         }
-
-    }
-
-    public short getShort() {
-        try {
-            if( littleEndian )
-                return (short)( (raf.read()&0xff) | (raf.read()&0xff << 8) );
-            else
-                return (short) ( (raf.read()&0xff << 8) | (raf.read()&0xff) );
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    public short getShort( byte[] buffer, int index ) {
-        if( littleEndian )
-            return (short)( (buffer[index]&0xff) | (buffer[index+1]&0xff << 8) );
-        else
-            return (short)( (buffer[index+1]&0xff) | (buffer[index]&0xff << 8) );
-    }
-
-    public int getInt() {
-        try {
-            ByteBuffer bb = ByteBuffer.allocate(4);
-            bb.order(ByteOrder.LITTLE_ENDIAN);
-            bb.putInt(raf.readInt());
-            bb.order(ByteOrder.BIG_ENDIAN);
-            return bb.getInt();
-
-//            if( littleEndian )
-//                return (raf.read()&0xff) | (raf.read()&0xff << 8) | (raf.read()&0xff << 16) | (raf.read()&0xff << 24);
-//            else
-//                return (raf.read()&0xff << 24) | (raf.read()&0xff << 16) | (raf.read()&0xff << 8) | (raf.read()&0xff);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    public int getInt( byte[] buffer, int index ) {
-        if( littleEndian )
-            return ( ((int)(buffer[index  ]&0xff)      ) |
-                    ((int)(buffer[index+1]&0xff) << 8 ) |
-                    ((int)(buffer[index+2]&0xff) << 16) |
-                    ((int)(buffer[index+3]&0xff) << 24)   );
-        else
-            return ( ((int)(buffer[index+3]&0xff)      ) |
-                    ((int)(buffer[index+2]&0xff) << 8 ) |
-                    ((int)(buffer[index+1]&0xff) << 16) |
-                    ((int)(buffer[index  ]&0xff) << 24)   );
-    }
-
-    public void getChars( byte[] buffer, int index, char[] charBuffer, int length )
-    {
-        for (int i = 0; i < length; i++) {
-            charBuffer[i] = (char) (buffer[index+i*2] + ( buffer[index+i*2+1] << 8) );
-        }
     }
 
     public class Header {
@@ -314,6 +251,9 @@ public class CompoundFile {
 
         public int read(byte[] buffer) {
             // see if it's actually a Compound Document File
+            ByteBuffer bb = ByteBuffer.wrap( buffer );
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+
             System.arraycopy(buffer, 0, headerID, 0, 8);
 
             if (!Arrays.equals(headerID, fileID)) {
@@ -321,23 +261,19 @@ public class CompoundFile {
                 return -1;
             }
 
-            // Ignore UID, Revision and Version                             // offset 8, size 16+2+2 = 20
-            // get the Endian bytes                                         // offset 28, size 2
             littleEndian = (buffer[28] == (byte) 0xfe) && (buffer[29] == (byte) 0xff);
-            sectorSize = getShort(buffer, 30);                  // offset 30, size 2
-            shortSectorSize = getShort(buffer, 32);             // offset 32, size 2
-            // ignore 10                                                    // offset 34, size 10
-            numberOfSectors = getInt(buffer, 44);                 // offset 44, size 4
-            directorySectorID = getInt(buffer, 48);               // offset 48, size 4
-            // ignore 4                                                     // offset 52, size 4
-            standardStreamSize = getInt(buffer, 56);              // offset 56, size 4
-            shortSectorID = getInt(buffer, 60);                   // offset 60, size 4
-            numberOfShortSectors = getInt(buffer, 64);            // offset 64, size 4
-            masterSectorID = getInt(buffer, 68);                  // offset 68, size 4
-            masterNumberOfSectors = getInt(buffer, 72);           // offset 72, size 4
+            sectorSize = bb.getShort(30);                  // offset 30, size 2
+            shortSectorSize = bb.getShort(32);             // offset 32, size 2
+            numberOfSectors = bb.getInt(44);                 // offset 44, size 4
+            directorySectorID = bb.getInt(48);               // offset 48, size 4
+            standardStreamSize = bb.getInt(56);              // offset 56, size 4
+            shortSectorID = bb.getInt(60);                   // offset 60, size 4
+            numberOfShortSectors = bb.getInt(64);            // offset 64, size 4
+            masterSectorID = bb.getInt(68);                  // offset 68, size 4
+            masterNumberOfSectors = bb.getInt(72);           // offset 72, size 4
 
             for (int i = 0; i < 109; i++) {
-                msat[i] = getInt(buffer, 76 + (i * 4));
+                msat[i] = bb.getInt(76 + (i * 4));
             }
             return 0;
         }
@@ -347,7 +283,7 @@ public class CompoundFile {
         public char[] nameChar = new char[32];
         public short nameSize;
         public byte type;
-        //        public byte colour;
+//        public byte colour;
         public int leftDirID;
         public int rightDirID;
         public int rootDirID;
@@ -373,11 +309,12 @@ public class CompoundFile {
         public void read( byte[] buffer, int index) {
             ByteBuffer bb = ByteBuffer.wrap( buffer );
             bb.order(ByteOrder.LITTLE_ENDIAN);
+            bb.position( index );
 
-            getChars(buffer, index, nameChar, 32);
+            for (int i=0; i<32; i++)
+                nameChar[i] = bb.getChar();
 
             nameSize = bb.getShort( index+64 );
-
             name = new String( nameChar, 0, nameSize/2-1 );
 
             type = bb.get( index+66 );
@@ -392,24 +329,6 @@ public class CompoundFile {
             sectorID = bb.getInt( index+116 );
             streamSize = bb.getInt( index+120 );
             // total of 128 bytes
-
-
-
-//            getChars( buffer, index, nameChar, 32 );
-//            nameSize = getShort( buffer, index + 64 );
-//            name = new String( nameChar, 0, nameSize/2-1 );
-//            type = buffer[index+66];
-////            colour = buffer[index+67];
-//            leftDirID = getInt( buffer, index+68 );
-//            rightDirID = getInt( buffer, index+72 );
-//            rootDirID = getInt( buffer, index+76 );
-////            System.arraycopy( buffer, index+80, uniqueID, 0, 16 );
-////            flags = getInt( buffer, index+96 );
-////            System.arraycopy( buffer, index+100, timeStampCreation, 0, 8 );
-////            System.arraycopy( buffer, index+108, timeStampModification, 0, 8 );
-//            sectorID = getInt( buffer, index+116 );
-//            streamSize = getInt( buffer, index+120 );
-//            // total of 128 bytes
         }
     }
 }

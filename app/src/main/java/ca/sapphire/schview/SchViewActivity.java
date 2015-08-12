@@ -2,7 +2,7 @@ package ca.sapphire.schview;
 
 /**
  * Todo: rework file reader to avoid temporary file
- * Todo: add component value field
+ * Todo: fix text rotations and orientations (rotating is only a hack, and that's only for Attribute
  * Todo: make basic and advanced versions (for distribution) based on what is viewed
  * Todo: add selectable input file
  * Todo: add viewing controls
@@ -239,7 +239,9 @@ public class Sch extends View {
         Log.i(TAG, "Scale: " + scale);
         canvas.scale(scale, scale);
 
-        canvas.translate(0, viewHeight / scale);
+        float xOff = (viewWidth-(Options.INSTANCE.xSheet*scale) ) / 2.0F;
+        float yOff = (viewHeight+(Options.INSTANCE.ySheet*scale) ) / 2.0F;
+        canvas.translate(xOff, (viewHeight/scale)-yOff );
 //        canvas.translate(50, 800);
 
         paint.setAntiAlias(false);
@@ -247,7 +249,7 @@ public class Sch extends View {
         paint.setDither(false);
         paint.setStyle(Paint.Style.STROKE);
 
-        Options.INSTANCE.render( cf.sf.grEngine );
+        Options.INSTANCE.render(cf.sf.grEngine);
 
         for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
             Options.INSTANCE.render();
@@ -257,7 +259,7 @@ public class Sch extends View {
         }
 
         cf.sf.grEngine.render();
-        cf.sf.grEngine.draw( canvas, paint );
+        cf.sf.grEngine.draw(canvas, paint);
 
 
 //            paint.setColor( 0xffff0000 );

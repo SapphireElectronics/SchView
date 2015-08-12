@@ -45,7 +45,7 @@ public class Designator extends SchBase implements Object {
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
         textpt = new PointF( x, y );
-        Utility.rotate( textpt, orientation );
+//        Utility.rotate( textpt, orientation );
 
         switch( justification ) {
             case 0: // Bottom Left

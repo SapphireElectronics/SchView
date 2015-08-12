@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.sapphire.altium.Attribute;
 import ca.sapphire.altium.Bus;
 import ca.sapphire.altium.CompBox;
 import ca.sapphire.altium.CompLine;
@@ -183,6 +184,9 @@ public class StreamFile {
                     break;
                 case 37:
                     objects.add( new Entry( result ));
+                    break;
+                case 41:
+                    objects.add( new Attribute( result ));
                     break;
             }
         }
