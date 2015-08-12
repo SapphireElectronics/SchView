@@ -92,7 +92,7 @@ public class StreamFile {
         }
 
         Log.i(TAG, "Records read: " + recordNumber);
-//        Log.i(TAG, "File pointer: " + fpr );
+//        Log.i(TAG, "File bytePointer: " + fpr );
 
     }
 
@@ -170,10 +170,10 @@ public class StreamFile {
                     objects.add( new Junction( result ));
                     break;
                 case 31:
-                    Options.INSTANCE.put( result );
+                    Options.INSTANCE.put(result);
                     break;
                 case 34:
-                    objects.add( new Designator( result ));
+                    objects.add(new Designator(result));
                     break;
                 case 37:
                     objects.add( new Entry( result ));

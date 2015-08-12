@@ -41,7 +41,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 
@@ -230,71 +232,140 @@ public class SchViewActivity extends Activity {
         sch.invalidate();
     }
 
-//    public class Sch extends SurfaceView implements SurfaceHolder.Callback {
-public class Sch extends View {
-    float viewWidth, viewHeight;
-    float scale = -1;
-    Paint paint = new Paint();
+    //    public class Sch extends SurfaceView implements SurfaceHolder.Callback {
+    public class Sch extends View {
+        private static final int INVALID_POINTER_ID = -1;
 
-    public Sch( Context context ) {
-        super( context );
-    }
+        float viewWidth, viewHeight;
+        float scale = 1;
+        Paint paint = new Paint();
 
-    @Override
-    protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld){
-        super.onSizeChanged(xNew, yNew, xOld, yOld);
-        viewWidth = xNew;
-        viewHeight = yNew;
-    }
+        private float mPosX;
+        private float mPosY;
 
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        public float getMPosX() { return mPosX; }
 
-        Log.i(TAG, "Drawing.");
+        public float getMPosY() { return mPosY; }
 
-        scale = Math.min(Math.abs(viewWidth / Options.INSTANCE.xSheet), Math.abs(viewHeight / Options.INSTANCE.ySheet));
-        Log.i(TAG, "Scale: " + scale);
-        canvas.scale(scale, scale);
+        private float mLastTouchX;
+        private float mLastTouchY;
+        private int mActivePointerId = INVALID_POINTER_ID;
 
-        float xOff = (viewWidth-(Options.INSTANCE.xSheet*scale) ) / 2.0F;
-        float yOff = (viewHeight+(Options.INSTANCE.ySheet*scale) ) / 2.0F;
-        canvas.translate(xOff, (viewHeight/scale)-yOff );
-//        canvas.translate(50, 800);
+        private ScaleGestureDetector mScaleDetector;
+        private GestureDetector mDetector;
 
-        paint.setAntiAlias(false);
-        paint.setStrokeWidth(0);
-        paint.setDither(false);
-        paint.setStyle(Paint.Style.STROKE);
+        private int state = 0;
 
-        Options.INSTANCE.render(cf.sf.grEngine);
 
-        for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
-            Options.INSTANCE.render();
-            object.render();
-            Options.INSTANCE.draw( canvas, paint );
-            object.draw( canvas, paint );
+        public Sch( Context context ) {
+            super( context );
+            mScaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
+            mDetector = new GestureDetector(this, new MyGestureListener());
+
+            Options.INSTANCE.render(cf.sf.grEngine);
+
+            for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+                Options.INSTANCE.render();
+                object.render();
+            }
+            cf.sf.grEngine.render();
         }
 
-        cf.sf.grEngine.render();
-        cf.sf.grEngine.draw(canvas, paint);
+        @Override
+        protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld){
+            super.onSizeChanged(xNew, yNew, xOld, yOld);
+            viewWidth = xNew;
+            viewHeight = yNew;
+        }
+
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            Log.i(TAG, "Drawing.");
+
+//            scale = Math.min(Math.abs(viewWidth / Options.INSTANCE.xSheet), Math.abs(viewHeight / Options.INSTANCE.ySheet));
+//            Log.i(TAG, "Scale: " + scale);
+            canvas.scale(scale, scale);
+
+            float xOff = (viewWidth-(Options.INSTANCE.xSheet*scale) ) / 2.0F;
+            float yOff = (viewHeight+(Options.INSTANCE.ySheet*scale)) / 2.0F;
+            canvas.translate(xOff, (viewHeight / scale) - yOff);
+            //        canvas.translate(50, 800);
+
+            paint.setAntiAlias(false);
+            paint.setStrokeWidth(0);
+            paint.setDither(false);
+            paint.setStyle(Paint.Style.STROKE);
+
+//            Options.INSTANCE.render(cf.sf.grEngine);
+
+            for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+//                Options.INSTANCE.render();
+//                object.render();
+                Options.INSTANCE.draw( canvas, paint );
+                object.draw( canvas, paint );
+            }
+
+//            cf.sf.grEngine.render();
+            cf.sf.grEngine.draw(canvas, paint);
 
 
-//            paint.setColor( 0xffff0000 );
-//            canvas.drawLine(-500, -500, 500, 500, paint);
-//            canvas.drawLine( 500, -500, -500, 500, paint);
-//
-//            canvas.drawLine( -500, -500, -500, 500, paint );
-//            canvas.drawLine( -500, 500, 500, 500, paint );
-//            canvas.drawLine( 500, 500, 500, -500, paint );
-//            canvas.drawLine( 500, -500, -500, -500, paint );
-//
-//            canvas.drawLine( 500, 0, -500, 0, paint );
-//            canvas.drawLine( 0, 500, 0, -500, paint );
-//
-//            paint.setColor( 0xff00ff00 );
-//            canvas.drawCircle( 500, -500, 50, paint );
+            //            paint.setColor( 0xffff0000 );
+            //            canvas.drawLine(-500, -500, 500, 500, paint);
+            //            canvas.drawLine( 500, -500, -500, 500, paint);
+            //
+            //            canvas.drawLine( -500, -500, -500, 500, paint );
+            //            canvas.drawLine( -500, 500, 500, 500, paint );
+            //            canvas.drawLine( 500, 500, 500, -500, paint );
+            //            canvas.drawLine( 500, -500, -500, -500, paint );
+            //
+            //            canvas.drawLine( 500, 0, -500, 0, paint );
+            //            canvas.drawLine( 0, 500, 0, -500, paint );
+            //
+            //            paint.setColor( 0xff00ff00 );
+            //            canvas.drawCircle( 500, -500, 50, paint );
+        }
+
+        //register user touches as drawing action
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+
+            mScaleDetector.onTouchEvent(event);
+            this.mDetector.onTouchEvent(event);
+            return super.onTouchEvent(event);
+        }
+
+        class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+            private static final String DEBUG_TAG = "Gestures";
+
+            @Override
+            public boolean onDown(MotionEvent event) {
+                Log.d(DEBUG_TAG,"onDown: " + event.toString());
+                return true;
+            }
+
+            @Override
+            public boolean onFling(MotionEvent event1, MotionEvent event2,
+                                   float velocityX, float velocityY) {
+                Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+                return true;
+            }
+        }
+
+        private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                scale *= detector.getScaleFactor();
+
+                // Don't let the object get too small or too large.
+                scale = Math.max(0.2f, Math.min(scale, 3.0f));
+                Log.i( TAG, "Scale: " + scale );
+
+                invalidate();
+                return true;
+            }
+        }
     }
-}
 }
 
 

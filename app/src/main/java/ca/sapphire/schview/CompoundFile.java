@@ -3,6 +3,7 @@ package ca.sapphire.schview;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,9 +36,6 @@ public class CompoundFile {
     ArrayList<Integer> dirTraverse = new ArrayList<>();  // list of directories compiled when traversing the directory tree
     List<Directory> directories = new ArrayList<>();
 
-    int mainDataSecID;
-    int mainDataSize = 0;
-
     int sectorBytes;
 
     StreamFile sf;
@@ -45,6 +43,18 @@ public class CompoundFile {
     public boolean done = false;
 
     public CompoundFile( String fileName ) {
+        // check to see if file has already been converted by comparing file dates
+        String streamFileName = fileName + ".str";
+        if( new File(streamFileName).lastModified() < new File(fileName).lastModified())
+        {
+            parse( fileName );
+        }
+
+        sf = new StreamFile( streamFileName );
+        done = true;
+    }
+
+    void parse( String fileName) {
         try {
             raf = new RandomAccessFile( fileName, "r" );
         } catch (FileNotFoundException e) {
@@ -55,7 +65,13 @@ public class CompoundFile {
         // Read HEADER
         // header is always 512 bytes
         byte[] buffer = new byte[512];
-        readNextSector( buffer, 512 );
+        try {
+            raf.readFully(buffer, 0, 512);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        readNextSector( buffer, 512 );
 
         header = new Header();
         if( header.read( buffer ) < 0 ) {
@@ -85,14 +101,14 @@ public class CompoundFile {
         // byte count for the start of a sector is 512 (for header) + sector*sectorSize
 
         for (int i = 0; i < header.numberOfSectors; i++) {
+            byte[] newSector = new byte[sectorBytes];
+
             try {
                 raf.seek( 512 + header.msat[i] * sectorBytes );
+                raf.readFully( newSector, 0, sectorBytes );
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            byte[] newSector = new byte[sectorBytes];
-            readNextSector( newSector, sectorBytes );
 
 /**
  * Seems to be a slight bug in the Altium file writer.  SAT sectors are supposed to start with -3
@@ -146,45 +162,32 @@ public class CompoundFile {
 
         traverse( 0 );
 
+        CompoundFileStream cfs = null;
+
         // look for the "FileHeader" entry in the directory, that's the file we want
         for ( Directory directory : directories ) {
             if( directory.name.equals( "FileHeader" ) ) {
+                cfs = new CompoundFileStream( directory.sectorID, sectorBytes, directory.streamSize );
                 Log.i(TAG, "Found FileHeader.");
-                mainDataSecID = directory.sectorID;
-                mainDataSize = directory.streamSize;
             }
         }
 
         // at this point, we should have mainDataSecID and mainDataSize set
-        if( mainDataSize < 0 ) {
+        if( cfs == null ) {
             Log.i(TAG, "Main data not found");
             return;
         }
 
-        // Walk the main data chain in the SAT until we get the value -2
-        int fileSecID = mainDataSecID;
-
-        try {
-            while( fileSecID != -2 ) {
-                fileID.add( fileSecID );
-                fileSecID = sat[ fileSecID ];
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         // make sure manifest allows write to external storage or this will fail.
         String streamFileName = fileName + ".str";
-        writeFile( streamFileName, raf, fileID );
+        writeFile( streamFileName, raf, cfs.sectorList );
+//        writeFile( streamFileName, raf, fileID );
 
         try {
             raf.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        sf = new StreamFile( streamFileName );
-        done = true;
     }
 
 
@@ -195,7 +198,7 @@ public class CompoundFile {
      * @param raf : Existing (open) Random Access File
      * @param sectorList : integer list of sectors
      */
-    public void writeFile( String fileName, RandomAccessFile raf, ArrayList<Integer> sectorList ) {
+    public void writeFile( String fileName, RandomAccessFile raf, List<Integer> sectorList ) {
         // make sure manifest allows write to external storage or this will fail.
         BufferedOutputStream bos = null;
         byte[] bf = new byte[sectorBytes];
@@ -242,16 +245,86 @@ public class CompoundFile {
             traverse(dir.rightDirID);
     }
 
-    public void readNextSector( byte[] buffer, int bytes ) {
-        try {
-            raf.readFully( buffer, 0, bytes );
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.i(TAG, "readNextSector: unable to read in a full sector.");
+    public class CompoundFileStream {
+        List<Integer> sectorList = new ArrayList<>();   // list of sectors in the stream
+//        String name;
+        int startSectorID;
+        int sectorSize;
+        int size;
+        int bytePointer;
+        int sectorPointer;
+        byte[] buffer;
+
+
+
+        public CompoundFileStream( int startSectorID, int sectorSize, int size ) {
+            this.startSectorID = startSectorID;
+            this.sectorSize = sectorSize;
+            this.size = size;
+
+            int fileSecID = startSectorID;
+            while( fileSecID != -2 ) {
+                sectorList.add( fileSecID );
+                fileSecID = sat[ fileSecID ];
+            }
+
+            buffer = new byte[sectorSize];
+            bytePointer = 0;
+            sectorPointer = 0;
+
+            readSector( sectorPointer );
+        }
+
+        public int available() {
+            return size- bytePointer;
+        }
+
+        public byte read() {
+            if( bytePointer >= size )
+                return -1;
+
+            if( bytePointer >= sectorSize )
+                if( readNextSector() < 0)
+                    return -1;
+
+            return buffer[bytePointer++];
+        }
+
+        public int readNextSector() {
+            if( ++sectorPointer >= sectorList.size() ) {
+                sectorPointer--;
+                return -1;
+            }
+
+            bytePointer = 0;
+            return rawReadSector();
+        }
+
+        public int readSector( int sector ) {
+            if( sector < 0 )
+                return -1;
+            if( sector > sectorList.size() )
+                return -1;
+
+            sectorPointer = sector;
+            bytePointer = 0;
+
+            return rawReadSector();
+        }
+
+        private int rawReadSector() {
+            try {
+                raf.seek( 512 + sectorList.get(sectorPointer)*sectorSize );
+                raf.read( buffer );
+            } catch (IOException e) {
+                e.printStackTrace();
+                return -1;
+            }
+            return 0;
         }
     }
 
-    public class Header {
+     public class Header {
         public final byte[] fileID = new byte[]{-48, -49, 17, -32, -95, -79, 26, -31};  // d0 cf 11 e0 a1 b1 1a e1
         public byte[] headerID = new byte[8];
         public boolean littleEndian;
