@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Reads a Compound Object File
@@ -32,6 +33,7 @@ public class CompoundFile {
     ArrayList<Integer> dirID = new ArrayList<>();        // list of sectors in Directory stream
     ArrayList<Integer> fileID = new ArrayList<>();                        // list of sectors in HeaderFile stream
     ArrayList<Integer> dirTraverse = new ArrayList<>();  // list of directories compiled when traversing the directory tree
+    List<Directory> directories = new ArrayList<>();
 
     int mainDataSecID;
     int mainDataSize = 0;
@@ -123,28 +125,37 @@ public class CompoundFile {
         // Walk the Directory chain in the SAT until we get the value -2
         int directorySector = header.directorySectorID;
 
+        int i = 0;
         while( directorySector != -2 ) {
-            dirID.add(header.directorySectorID);
+            // add current directory sector to list of directories, get the next sector location
+            dirID.add( directorySector );
             directorySector = sat[directorySector];
-        }
 
-        for (int i = 0; i < dirID.size(); i++) {
+            // seek to the start of the directory sector information and read it
+            byte[] newSector = new byte[sectorBytes];
             try {
-                raf.seek( 512 + dirID.get(i) * sectorBytes );
+                raf.seek( 512 + dirID.get(i++) * sectorBytes);
+                raf.readFully( newSector, 0, sectorBytes );
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            byte[] newSector = new byte[sectorBytes];
-            readNextSector(newSector, sectorBytes);
-
+            // store directory information for later parsing
             dirSectors.add(newSector);
         }
 
         traverse( 0 );
 
-        // at this point, we should have mainDataSecID and mainDataSize set
+        // look for the "FileHeader" entry in the directory, that's the file we want
+        for ( Directory directory : directories ) {
+            if( directory.name.equals( "FileHeader" ) ) {
+                Log.i(TAG, "Found FileHeader.");
+                mainDataSecID = directory.sectorID;
+                mainDataSize = directory.streamSize;
+            }
+        }
 
+        // at this point, we should have mainDataSecID and mainDataSize set
         if( mainDataSize < 0 ) {
             Log.i(TAG, "Main data not found");
             return;
@@ -163,13 +174,35 @@ public class CompoundFile {
         }
 
         // make sure manifest allows write to external storage or this will fail.
-        BufferedOutputStream bos = null;
         String streamFileName = fileName + ".str";
+        writeFile( streamFileName, raf, fileID );
+
+        try {
+            raf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        sf = new StreamFile( streamFileName );
+        done = true;
+    }
+
+
+    /**
+     * Writes a file to storage from an existing Random Access File and sector list.
+     *
+     * @param fileName : Name of new file to write
+     * @param raf : Existing (open) Random Access File
+     * @param sectorList : integer list of sectors
+     */
+    public void writeFile( String fileName, RandomAccessFile raf, ArrayList<Integer> sectorList ) {
+        // make sure manifest allows write to external storage or this will fail.
+        BufferedOutputStream bos = null;
         byte[] bf = new byte[sectorBytes];
 
         try {
-            bos = new BufferedOutputStream(new FileOutputStream(streamFileName));
-            for( int sector : fileID ) {
+            bos = new BufferedOutputStream(new FileOutputStream( fileName ));
+            for( int sector : sectorList ) {
                 raf.seek( 512 + sector * sectorBytes );
                 raf.readFully(bf, 0, sectorBytes);
                 bos.write( bf );
@@ -181,20 +214,16 @@ public class CompoundFile {
         try {
             if( bos != null)
                 bos.close();
-            raf.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        sf = new StreamFile( streamFileName );
-
-        done = true;
     }
 
     public void traverse( int id ) {
         dirTraverse.add( id );
 
         Directory dir = new Directory();
+        directories.add( dir );
 
         int dirsPerSector = sectorBytes/128;
 
@@ -203,26 +232,14 @@ public class CompoundFile {
 
         dir.read( dirSectors.get( secID ), offset );
 
-        Log.i(TAG, "Dir " + dir.name);
-
-        if(  dir.name.equals( "FileHeader")) {
-            Log.i( TAG, "Found FileHeader.");
-            mainDataSecID = dir.sectorID;
-            mainDataSize = dir.streamSize;
-        }
-
-        if( dir.rootDirID != -1 ) {
+        if( dir.rootDirID != -1 )
             traverse(dir.rootDirID);
-        }
 
-        if( dir.leftDirID != -1 ) {
+        if( dir.leftDirID != -1 )
             traverse(dir.leftDirID);
-        }
 
-        if( dir.rightDirID != -1 ) {
+        if( dir.rightDirID != -1 )
             traverse(dir.rightDirID);
-        }
-
     }
 
     public void readNextSector( byte[] buffer, int bytes ) {

@@ -129,13 +129,6 @@ public class StreamFile {
         String record = result.get("RECORD");
 
         if (record != null) {
-
-//            if( result.get("OWNERINDEX") != null )
-//                if( result.get("OWNERINDEX").equals("81"))
-
-            if (record.equals("4")||record.equals("9")||record.equals("10")||record.equals("11"))
-                    Log.i("Record", result.toString());
-
             switch (Integer.parseInt(record)) {
                 case 1:
                     Component component = new Component( result );
