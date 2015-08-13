@@ -49,31 +49,31 @@ public class Designator extends SchBase implements Object {
 
         switch( justification ) {
             case 0: // Bottom Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.LEFT, Text.Valign.BOTTOM );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.BOTTOM );
                 break;
             case 1: // Bottom Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.BOTTOM );
                 break;
             case 2: // Bottom Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.RIGHT, Text.Valign.BOTTOM );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
                 break;
             case 3: // Centre Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.LEFT, Text.Valign.CENTER );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.CENTER );
                 break;
             case 4: // Centre Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.CENTER );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.CENTER );
                 break;
             case 5: // Centre Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.RIGHT, Text.Valign.CENTER );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.CENTER );
                 break;
             case 6: // Top Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.LEFT, Text.Valign.TOP );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.TOP );
                 break;
             case 7: // Top Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.TOP );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.TOP );
                 break;
             case 8: // Top Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, Text.Halign.RIGHT, Text.Valign.TOP );
+                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.TOP );
                 break;
         }
     }

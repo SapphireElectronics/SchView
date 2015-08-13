@@ -85,18 +85,18 @@ public enum Options implements Object {
 
         for (int i = 0; i < xZones; i++) {
             int xLoc = (2*i+1)*xSheet/(xZones*2);
-            Text tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, yMargin/2 ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
+            Text tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, yMargin/2 ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw(canvas, paint);
-            tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, ySheet-yMargin/2 ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
+            tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, ySheet-yMargin/2 ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw(canvas, paint);
         }
 
         for (int i = 0; i < yZones; i++) {
             int yLoc = (2*i+1)*ySheet/(yZones*2);
             String ch = Character.toString ((char) ((yZones-i)+64));
-            Text tag = new Text( ch, new PointF( xMargin/2, yLoc ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
+            Text tag = new Text( ch, new PointF( xMargin/2, yLoc ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw( canvas, paint );
-            tag = new Text( ch, new PointF( xMargin-xMargin/2, yLoc ), 0xff404040, Text.Halign.CENTER, Text.Valign.CENTER );
+            tag = new Text( ch, new PointF( xMargin-xMargin/2, yLoc ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
             tag.draw(canvas, paint);
         }
     }

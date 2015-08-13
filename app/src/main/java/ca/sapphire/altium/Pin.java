@@ -94,20 +94,20 @@ public class Pin extends SchBase implements Object {
         // TODO check designator (pin number) orientation in Altium
         switch( orientation ) {
             case 0:
-                nameTag = new Text( name, nameTextpt, color, Text.Halign.RIGHT, Text.Valign.CENTER );
-                desTag = new Text( designator, desTextpt, color, Text.Halign.LEFT, Text.Valign.BOTTOM );
+                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.CENTER );
+                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.LEFT, Text.Valign.BOTTOM );
                 break;
             case 1:
-                nameTag = new Text( name, nameTextpt, color, Text.Halign.CENTER, Text.Valign.TOP );
-                desTag = new Text( designator, desTextpt, color, Text.Halign.LEFT, Text.Valign.BOTTOM );
+                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.CENTER, Text.Valign.TOP );
+                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.LEFT, Text.Valign.BOTTOM );
                 break;
             case 2:
-                nameTag = new Text( name, nameTextpt, color, Text.Halign.LEFT, Text.Valign.CENTER );
-                desTag = new Text( designator, desTextpt, color, Text.Halign.RIGHT, Text.Valign.BOTTOM );
+                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.LEFT, Text.Valign.CENTER );
+                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
                 break;
             case 3:
-                nameTag = new Text( name, nameTextpt, color, Text.Halign.CENTER, Text.Valign.BOTTOM );
-                desTag = new Text( designator, desTextpt, color, Text.Halign.RIGHT, Text.Valign.BOTTOM );
+                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
                 break;
         }
     }

@@ -114,19 +114,19 @@ public class PowerPort implements Object {
 
         switch( rotation ) {
             case 0:
-                tag = new Text( name, textpt, color, Text.Halign.LEFT, Text.Valign.CENTER );
+                tag = new Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.CENTER );
                 break;
 
             case 1:
-                tag = new Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                tag = new Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.BOTTOM );
                 break;
 
             case 2:
-                tag = new Text(name, textpt, color, Text.Halign.RIGHT, Text.Valign.CENTER);
+                tag = new Text(name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.CENTER);
                 break;
 
             case 3:
-                tag = new Text( name, textpt, color, Text.Halign.CENTER, Text.Valign.TOP );
+                tag = new Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.TOP );
                 break;
 
         }
