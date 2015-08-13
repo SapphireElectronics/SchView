@@ -35,7 +35,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
@@ -218,7 +217,7 @@ public class SchViewActivity extends Activity {
     };
 
     public void viewFile() {
-        viewHandler.postDelayed( viewRunnable, 100 );
+        viewHandler.postDelayed(viewRunnable, 100);
         cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
     }
 
@@ -228,43 +227,45 @@ public class SchViewActivity extends Activity {
         Sch sch = new Sch( this );
         setContentView(sch);
 //        sch.setBackgroundColor( Color.WHITE );
-        sch.setBackgroundColor( 0xfffffcf8 );
+        sch.setBackgroundColor(0xfffffcf8);
         sch.invalidate();
     }
+
+
 
     //    public class Sch extends SurfaceView implements SurfaceHolder.Callback {
     public class Sch extends View {
         private static final int INVALID_POINTER_ID = -1;
 
+        private ScaleGestureDetector mScaleDetector;
+        private GestureDetector gestureDetector;
+
         float viewWidth, viewHeight;
         float scale = 1;
         Paint paint = new Paint();
 
-        private float mPosX;
-        private float mPosY;
+        private static final int NONE = 0;
+        private static final int DRAG = 1;
+        private static final int ZOOM = 2;
 
-        public float getMPosX() { return mPosX; }
+        private int mode;
 
-        public float getMPosY() { return mPosY; }
-
-        private float mLastTouchX;
-        private float mLastTouchY;
-        private int mActivePointerId = INVALID_POINTER_ID;
-
-        private ScaleGestureDetector mScaleDetector;
-        private GestureDetector mDetector;
-
-        private int state = 0;
+        float startX = 0;
+        float startY = 0;
+        float translateX = 0;
+        float translateY = 0;
+        float previousTranslateX = 0;
+        float previousTranslateY = 0;
 
 
-        public Sch( Context context ) {
-            super( context );
+        public Sch(Context context) {
+            super(context);
             mScaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-            mDetector = new GestureDetector(this, new MyGestureListener());
+            gestureDetector = new GestureDetector(getContext(), new GestureListener());
 
             Options.INSTANCE.render(cf.sf.grEngine);
 
-            for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+            for (ca.sapphire.altium.Object object : cf.sf.objects) {
                 Options.INSTANCE.render();
                 object.render();
             }
@@ -272,7 +273,7 @@ public class SchViewActivity extends Activity {
         }
 
         @Override
-        protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld){
+        protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
             super.onSizeChanged(xNew, yNew, xOld, yOld);
             viewWidth = xNew;
             viewHeight = yNew;
@@ -283,13 +284,15 @@ public class SchViewActivity extends Activity {
 
             Log.i(TAG, "Drawing.");
 
+            canvas.save();
 //            scale = Math.min(Math.abs(viewWidth / Options.INSTANCE.xSheet), Math.abs(viewHeight / Options.INSTANCE.ySheet));
 //            Log.i(TAG, "Scale: " + scale);
             canvas.scale(scale, scale);
 
-            float xOff = (viewWidth-(Options.INSTANCE.xSheet*scale) ) / 2.0F;
-            float yOff = (viewHeight+(Options.INSTANCE.ySheet*scale)) / 2.0F;
-            canvas.translate(xOff, (viewHeight / scale) - yOff);
+            float xOff = (viewWidth - (Options.INSTANCE.xSheet * scale)) / 2.0F;
+            float yOff = (viewHeight + (Options.INSTANCE.ySheet * scale)) / 2.0F;
+            canvas.translate( translateX/scale, translateY/scale);
+//            canvas.translate(xOff, (viewHeight / scale) - yOff);
             //        canvas.translate(50, 800);
 
             paint.setAntiAlias(false);
@@ -299,15 +302,16 @@ public class SchViewActivity extends Activity {
 
 //            Options.INSTANCE.render(cf.sf.grEngine);
 
-            for( ca.sapphire.altium.Object object  : cf.sf.objects ) {
+            for (ca.sapphire.altium.Object object : cf.sf.objects) {
 //                Options.INSTANCE.render();
 //                object.render();
-                Options.INSTANCE.draw( canvas, paint );
-                object.draw( canvas, paint );
+                Options.INSTANCE.draw(canvas, paint);
+                object.draw(canvas, paint);
             }
 
 //            cf.sf.grEngine.render();
             cf.sf.grEngine.draw(canvas, paint);
+            canvas.restore();
 
 
             //            paint.setColor( 0xffff0000 );
@@ -326,16 +330,59 @@ public class SchViewActivity extends Activity {
             //            canvas.drawCircle( 500, -500, 50, paint );
         }
 
+
         //register user touches as drawing action
         @Override
         public boolean onTouchEvent(MotionEvent event) {
+            Log.d( "OnTouchEvent","Evt: " + event.toString());
 
-            mScaleDetector.onTouchEvent(event);
-            this.mDetector.onTouchEvent(event);
-            return super.onTouchEvent(event);
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
+                    //The first finger has been pressed.
+                    mode = DRAG;
+                    startX = event.getX() - previousTranslateX;
+                    startY = event.getY() - previousTranslateY;
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    //We don't need to set the mode at this point because the mode is already set to DRAG
+                    translateX = event.getX() - startX;
+                    translateY = event.getY() - startY;
+                    break;
+
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    //The second finger has been placed on the screen
+                    mode = ZOOM;
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    //All fingers are off the screen
+                    mode = NONE;
+                    previousTranslateX = translateX;
+                    previousTranslateY = translateY;
+                    break;
+
+                case MotionEvent.ACTION_POINTER_UP:
+                    //The second finger is off the screen and so we're back to dragging.
+                    mode = DRAG;
+                    previousTranslateX = translateX;
+                    previousTranslateY = translateY;
+                    break;
+            }
+
+            gestureDetector.onTouchEvent(event);
+
+            if( mode == DRAG  || mode == ZOOM )
+                invalidate();
+
+
+
+//            mScaleDetector.onTouchEvent(event);
+            return true;
+//            return super.onTouchEvent(event);
         }
 
-        class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        class GestureListener extends GestureDetector.SimpleOnGestureListener {
             private static final String DEBUG_TAG = "Gestures";
 
             @Override
@@ -345,14 +392,19 @@ public class SchViewActivity extends Activity {
             }
 
             @Override
-            public boolean onFling(MotionEvent event1, MotionEvent event2,
-                                   float velocityX, float velocityY) {
+            public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
                 Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
+                Log.d(DEBUG_TAG, "onScroll: " + event1.toString()+event2.toString());
                 return true;
             }
         }
 
-        private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
                 scale *= detector.getScaleFactor();
@@ -361,7 +413,7 @@ public class SchViewActivity extends Activity {
                 scale = Math.max(0.2f, Math.min(scale, 3.0f));
                 Log.i( TAG, "Scale: " + scale );
 
-                invalidate();
+//                invalidate();
                 return true;
             }
         }

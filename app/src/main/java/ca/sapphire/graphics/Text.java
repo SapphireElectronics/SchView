@@ -25,6 +25,8 @@ public class Text implements GraphicsObject {
         this.color = color;
         this.hAlign = hAlign;
         this.vAlign = vAlign;
+
+
     }
 
     @Override
@@ -32,23 +34,25 @@ public class Text implements GraphicsObject {
         Rect bounds = new Rect();
         paint.getTextBounds( text, 0, text.length(), bounds );
 
+        PointF draw = new PointF(location.x, location.y);
+
         switch( hAlign ) {
             case CENTER:
-                location.x -= bounds.exactCenterX();
+                draw.x -= bounds.exactCenterX();
                 break;
             case RIGHT:
-                location.x -= ( bounds.width() + 1 );
+                draw.x -= ( bounds.width() + 1 );
         }
 
         switch( vAlign ) {
             case TOP:
-                location.y += bounds.height();
+                draw.y += bounds.height();
                 break;
             case CENTER:
-                location.y -= bounds.exactCenterY();
+                draw.y -= bounds.exactCenterY();
         }
 
         paint.setColor( color );
-        canvas.drawText( text, location.x, location.y, paint );
+        canvas.drawText( text, draw.x, draw.y, paint );
     }
 }
