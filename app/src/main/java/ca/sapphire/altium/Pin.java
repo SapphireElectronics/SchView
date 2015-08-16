@@ -10,6 +10,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
 import ca.sapphire.graphics.Text;
 
 /**
@@ -29,8 +30,13 @@ public class Pin extends SchBase implements Object {
     ca.sapphire.graphics.Text nameTag, desTag;
     PointF nameTextpt, desTextpt;
 
-    public Pin( Map<String, String> record, boolean multiPartComponent  ) {
+    GrEngine engine;
+
+    public Pin( Map<String, String> record, boolean multiPartComponent, GrEngine engine ) {
+
+//    public Pin( Map<String, String> record, boolean multiPartComponent  ) {
         super(record);
+        this.engine = engine;
         x = Utility.getIntValue(record, "LOCATION.X");
         y = -Utility.getIntValue(record, "LOCATION.Y");
         length = Integer.parseInt(record.get("PINLENGTH"));
@@ -55,26 +61,31 @@ public class Pin extends SchBase implements Object {
 
     @Override
     public void draw(Canvas canvas, Paint paint) {
-        if( !drawable )
-            return;
-
-        if( (option & PIN_INVISIBLE) > 0 )
-            return;
-
-        paint.setColor(color);
-        canvas.drawLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, paint);
-
-        paint.setTextSize(textSize);
-
-        if( (option & NAME_VISIBLE) > 0 )
-            nameTag.draw(canvas, paint);
-
-        if( (option & DESIGNATOR_VISIBLE) > 0 )
-            desTag.draw(canvas, paint);
+//        if( !drawable )
+//            return;
+//
+//        if( (option & PIN_INVISIBLE) > 0 )
+//            return;
+//
+//        paint.setColor(color);
+//        canvas.drawLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, paint);
+//
+//        paint.setTextSize(textSize);
+//
+//        if( (option & NAME_VISIBLE) > 0 )
+//            nameTag.draw(canvas, paint);
+//
+//        if( (option & DESIGNATOR_VISIBLE) > 0 )
+//            desTag.draw(canvas, paint);
     }
 
     @Override
     public void render() {
+        render( engine );
+    }
+
+//    @Override
+    public void render( GrEngine engine ) {
         if( !drawable )
             return;
 
@@ -110,6 +121,31 @@ public class Pin extends SchBase implements Object {
                 desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
                 break;
         }
+
+        if( !drawable )
+            return;
+
+        if( (option & PIN_INVISIBLE) > 0 )
+            return;
+
+//        paint.setColor(color);
+//        canvas.drawLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, paint);
+//
+//        paint.setTextSize(textSize);
+//
+//        if( (option & NAME_VISIBLE) > 0 )
+//            nameTag.draw(canvas, paint);
+//
+//        if( (option & DESIGNATOR_VISIBLE) > 0 )
+//            desTag.draw(canvas, paint);
+
+        engine.addLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, color, 0);
+
+        if( (option & NAME_VISIBLE) > 0 )
+            engine.addText( name, nameTag.draw.x, nameTag.draw.y, color, textSize );
+
+        if( (option & DESIGNATOR_VISIBLE) > 0 )
+            engine.addText( designator, desTag.draw.x, desTag.draw.y, color, textSize );
     }
 
     @Override

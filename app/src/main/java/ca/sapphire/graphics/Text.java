@@ -15,10 +15,11 @@ import ca.sapphire.altium.Options;
 public class Text implements GraphicsObject {
     public static enum Halign { LEFT, CENTER, RIGHT };
     public static enum Valign { TOP, CENTER, BOTTOM };
-    PointF location, draw;
+    public PointF location, draw;
     int color;
     float textSize;
     String text;
+    Paint paint;
 
     public Halign hAlign;
     public Valign vAlign;

@@ -137,7 +137,7 @@ public class StreamFile {
                         multiPartComponent = true;
                     break;
                 case 2:
-                    objects.add( new Pin( result, multiPartComponent ));
+                    objects.add( new Pin( result, multiPartComponent, grEngine ));
                     break;
                 case 4:
                     objects.add( new Text( result ));

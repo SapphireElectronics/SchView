@@ -31,6 +31,8 @@ public enum Options implements Object {
     byte fontCount, fontSize[], fontRotation[];
     public int xSheet = 0;
     public int ySheet = 0;
+    public int width = 0;
+    public int height = 0;
     int xMargin = 20;
     int yMargin = -20;
     int xZones = 0;
@@ -55,8 +57,10 @@ public enum Options implements Object {
             if( sheetStyle >= xSheetConst.length )
                 sheetStyle = 0;
             if( sheetStyle > 0) {
-                xSheet = xSheetConst[ sheetStyle ];
-                ySheet = -ySheetConst[ sheetStyle ];
+                width = xSheetConst[ sheetStyle ];
+                height = ySheetConst[ sheetStyle ];
+                xSheet = width;
+                ySheet = -height;
                 xZones = xZonesConst[ sheetStyle ];
                 yZones = yZonesConst[ sheetStyle ];
             }

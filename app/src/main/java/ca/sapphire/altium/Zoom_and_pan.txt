@@ -1,0 +1,24 @@
+Constants:
+    (xView, yView) = size of screen
+    (xSheet, ySheet) = size of schematic sheet
+
+To set the initial scale so the full schematic appears:
+    Calculate the scale factor that allows the sheet to fit in the view in both X and Y
+        This is done by dividing the View size by the Sheet size
+            Scale = abs( View / Sheet )
+    Take the smaller of the two X and Y scales as the scale to be used.
+
+    Note that View size is always positive, but the Sheet size can actually be negative
+    since it is actually represents the plotable bounds of the sheet.  To convert from a
+    Cartesian XY plane where X increases to the Right and Y increases to the Top to the
+    Android XY plane where X increases to the Right and Y increases to the Bottom we need to
+    multiple all Y values by -1.  We can't use a scale=-1 because that results in all the text
+    being flipped top to bottom and rendered upside down.  (In other words, the Y vector for
+    Android is 180' different from the Y vector for Cartesian geometry.)
+
+To centre the schematic on the page:
+    Calculate the difference between the screen size and the scaled sheet size
+        This is done by multiplying the Sheet size by the Scale and subtracting it from the View
+            Difference = View - (Sheet * Scale)
+    Take half that value as the offset
+        Offset = Difference / 2
