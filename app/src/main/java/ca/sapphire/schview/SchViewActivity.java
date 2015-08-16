@@ -239,15 +239,16 @@ public class SchViewActivity extends Activity {
         private ScaleGestureDetector mScaleDetector;
         private GestureDetector gestureDetector;
 
+        Paint paint = new Paint();
+
         RectF viewRect = new RectF();
         RectF schRect;
         float scale = 1;
-        Paint paint = new Paint();
+        float scaleX, scaleY;
+        float minScale, maxScale;
 
         float translateX = 0;
         float translateY = 0;
-
-        float scaleX, scaleY;
 
         boolean firstDraw = true;
 
@@ -288,6 +289,9 @@ public class SchViewActivity extends Activity {
 
                 scale = Math.min(scaleX, scaleY);
                 Log.i( "Scale", "view(x,y), sheet(x,y): ( " + viewRect.width() + " , " + viewRect.height() + " ) , ( " +  schRect.width() + " , " + schRect.height() + " )" );
+
+                minScale = scale * 0.9f;
+                maxScale = 2.5f;
 
                 translateX = viewRect.centerX() - scale * schRect.centerX();
                 translateY = viewRect.centerY() - scale * schRect.centerY();
@@ -357,9 +361,8 @@ public class SchViewActivity extends Activity {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             gestureDetector.onTouchEvent( event );
-            mScaleDetector.onTouchEvent(event);
+            mScaleDetector.onTouchEvent( event );
             return true;
-//            return super.onTouchEvent(event);
         }
 
         class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -385,6 +388,18 @@ public class SchViewActivity extends Activity {
                 return true;
             }
 
+            @Override
+            public void onLongPress(MotionEvent event) {
+                Log.d(DEBUG_TAG,"onLongPress: " + event.toString());
+
+                scale = 1;
+
+                translateX += (viewRect.centerX() - event.getX());
+                translateY += viewRect.centerY() - event.getY();
+
+                invalidate();
+            }
+
 //            @Override
 //            public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
 //                Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
@@ -406,19 +421,11 @@ public class SchViewActivity extends Activity {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
 
-                float scaleFactor = detector.getScaleFactor();
-
-                if( scale >= 3.0 && scaleFactor > 1)
-                    return true;
-
-                if( scale <= 0.2f && scaleFactor < 1 )
-                    return true;
-
                 float scaleOld = scale;
-                scale *= scaleFactor;
+                scale *= detector.getScaleFactor();
 
                 // Don't let the object get too small or too large.
-                scale = Math.max(0.2f, Math.min(scale, 3.0f));
+                scale = Math.max(minScale, Math.min(scale, maxScale));
                 Log.i( TAG, "Scale: " + scale + ", " + detector.getFocusX() + ", " + detector.getFocusY() );
 
                 translateX += detector.getFocusX() * (scaleOld - scale);
