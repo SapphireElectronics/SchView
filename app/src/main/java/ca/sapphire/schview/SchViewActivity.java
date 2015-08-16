@@ -237,30 +237,19 @@ public class SchViewActivity extends Activity {
     //    public class Sch extends SurfaceView implements SurfaceHolder.Callback {
     public class Sch extends View {
         private ScaleGestureDetector mScaleDetector;
-//        private GestureDetector doubleTapDetector;
         private GestureDetector gestureDetector;
 
-        float viewWidth, viewHeight;
+        RectF viewRect = new RectF();
+        RectF schRect;
         float scale = 1;
         Paint paint = new Paint();
 
-        private static final int NONE = 0;
-        private static final int DRAG = 1;
-        private static final int ZOOM = 2;
-
-        private int mode;
-
-        float startX = 0;
-        float startY = 0;
         float translateX = 0;
         float translateY = 0;
-        float previousTranslateX = 0;
-        float previousTranslateY = 0;
 
         float scaleX, scaleY;
 
         boolean firstDraw = true;
-
 
         public Sch(Context context) {
             super(context);
@@ -274,16 +263,15 @@ public class SchViewActivity extends Activity {
                 object.render();
             }
             cf.sf.grEngine.render();
+            schRect = new RectF( 0, 0, Options.INSTANCE.xSheet, Options.INSTANCE.ySheet );
         }
 
         @Override
         protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
             super.onSizeChanged(xNew, yNew, xOld, yOld);
-            viewWidth = xNew;
-            viewHeight = yNew;
+            viewRect.set( 0, 0, xNew, yNew );
         }
 
-        RectF viewRect, schRect;
 
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
@@ -295,14 +283,11 @@ public class SchViewActivity extends Activity {
             if( firstDraw ) {
                 firstDraw = false;
 
-                viewRect = new RectF( 0, 0, viewWidth, viewHeight );
-                schRect = new RectF( 0, 0, Options.INSTANCE.xSheet, Options.INSTANCE.ySheet );
-
                 scaleX = Math.abs(viewRect.width() / schRect.width() );
                 scaleY = Math.abs(viewRect.height() / schRect.height());
 
                 scale = Math.min(scaleX, scaleY);
-                Log.i( "Scale", "view(x,y), sheet(x,y): ( " + viewWidth + " , " + viewHeight + " ) , ( " +  Options.INSTANCE.xSheet + " , " + Options.INSTANCE.ySheet + " )" );
+                Log.i( "Scale", "view(x,y), sheet(x,y): ( " + viewRect.width() + " , " + viewRect.height() + " ) , ( " +  schRect.width() + " , " + schRect.height() + " )" );
 
                 translateX = viewRect.centerX() - scale * schRect.centerX();
                 translateY = viewRect.centerY() - scale * schRect.centerY();
@@ -325,14 +310,10 @@ public class SchViewActivity extends Activity {
                 translateY = Math.max(translateY, viewRect.top - schRect.bottom * scale);
                 translateY = Math.min(translateY, viewRect.bottom - schRect.top * scale);
             }
-
-            previousTranslateX = translateX;
-            previousTranslateY = translateY;
-
             Log.i( "Translate", "X: " + translateX + "  Y: " + translateY + "  Scale: " + scale );
 
+            canvas.translate(translateX, translateY);
             canvas.scale(scale, scale);
-            canvas.translate( translateX/scale, translateY/scale);
 
             paint.setAntiAlias(false);
             paint.setStrokeWidth(0);
@@ -375,62 +356,8 @@ public class SchViewActivity extends Activity {
         //register user touches as drawing action
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-//            Log.d( "OnTouchEvent","Evt: " + event.toString());
-
-            if( gestureDetector.onTouchEvent( event ) )
-                return true;
-
-            switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                case MotionEvent.ACTION_DOWN:   // first finger touch
-                    mode = DRAG;
-                    startX = event.getX() - previousTranslateX;
-                    startY = event.getY() - previousTranslateY;
-                    break;
-
-                case MotionEvent.ACTION_MOVE:   // move regardless of how many touches are down
-                    if( mode == DRAG ) {
-                        translateX = event.getX() - startX;
-                        translateY = event.getY() - startY;
-                    }
-                    if( mode == ZOOM ) {
-                        translateX = ( event.getX() - startX) * scale;
-                        translateY = ( event.getY() - startY) * scale;
-                    }
-                    break;
-
-                case MotionEvent.ACTION_POINTER_DOWN:
-                    //The second finger has been placed on the screen
-                    mode = ZOOM;
-                    break;
-
-                case MotionEvent.ACTION_UP:
-                    //All fingers are off the screen
-                    mode = NONE;
-                    previousTranslateX = translateX;
-                    previousTranslateY = translateY;
-                    break;
-
-                case MotionEvent.ACTION_POINTER_UP:
-                    //The second finger is off the screen and so we're back to dragging.
-                    mode = DRAG;
-//                    translateX = event.getX() - startX;
-//                    translateY = event.getY() - startY;
-
-                    translateX = (event.getX() - startX) * scale;
-                    translateY = (event.getY() - startY) * scale;
-//                    previousTranslateX = translateX;
-//                    previousTranslateY = translateY;
-                    break;
-            }
-
-//            gestureDetector.onTouchEvent(event);
+            gestureDetector.onTouchEvent( event );
             mScaleDetector.onTouchEvent(event);
-
-            if( mode == DRAG  || mode == ZOOM )
-                invalidate();
-
-
-
             return true;
 //            return super.onTouchEvent(event);
         }
@@ -454,9 +381,6 @@ public class SchViewActivity extends Activity {
                 translateX += (viewRect.centerX() - event.getX());
                 translateY += viewRect.centerY() - event.getY();
 
-                previousTranslateX = translateX;
-                previousTranslateY = translateY;
-                mode = NONE;
                 invalidate();
                 return true;
             }
@@ -467,35 +391,43 @@ public class SchViewActivity extends Activity {
 //                return true;
 //            }
 
-//            @Override
-//            public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
-//                Log.d(DEBUG_TAG, "onScroll: " + event1.toString()+event2.toString());
-//                return true;
-//            }
+            @Override
+            public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) {
+                Log.d(DEBUG_TAG, "onScroll: " + event1.toString()+event2.toString());
+                translateX -= distanceX;
+                translateY -= distanceY;
+                invalidate();
+                return true;
+            }
         }
 
         class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                scale *= detector.getScaleFactor();
+
+                float scaleFactor = detector.getScaleFactor();
+
+                if( scale >= 3.0 && scaleFactor > 1)
+                    return true;
+
+                if( scale <= 0.2f && scaleFactor < 1 )
+                    return true;
+
+                float scaleOld = scale;
+                scale *= scaleFactor;
 
                 // Don't let the object get too small or too large.
                 scale = Math.max(0.2f, Math.min(scale, 3.0f));
-                Log.i( TAG, "Scale: " + scale );
+                Log.i( TAG, "Scale: " + scale + ", " + detector.getFocusX() + ", " + detector.getFocusY() );
 
-                translateX /= scale;
-                translateY /= scale;
+                translateX += detector.getFocusX() * (scaleOld - scale);
+                translateY -= detector.getFocusY() * (scaleOld - scale);
 
-//                translateX = detector.getFocusX() - startX;
-//                translateY = detector.getFocusY() - startY;
-
-//                invalidate();
+                invalidate();
                 return true;
             }
         }
-
-
     }
 }
 
