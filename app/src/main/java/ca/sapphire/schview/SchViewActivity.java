@@ -5,9 +5,8 @@ package ca.sapphire.schview;
  * Todo: fix text rotations and orientations (rotating is only a hack, and that's only for Attribute
  * Todo: make basic and advanced versions (for distribution) based on what is viewed
  * Todo: add selectable input file
- * Todo: add viewing controls
  * Todo: add title block
- * Todo: add visible grid ?? - have to draw grid before other objects
+ *
  *
  * Restructure operations:
  *
@@ -34,9 +33,11 @@ import ca.sapphire.schview.util.SystemUiHider;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -149,6 +150,15 @@ public class SchViewActivity extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+
+        // get the intent and intent data that started this activity
+        // to see if it was launched with a filename.
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+
+        Log.i( TAG, "Data: " + data );
+        Log.i( TAG, "Type: " + intent.getType() );
+        Log.i( TAG, "Intent: " + intent );
 
         viewFile();
     }
