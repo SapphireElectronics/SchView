@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +79,8 @@ public class StreamFile {
     boolean multiPartComponent = false;
     public GrEngine grEngine = new GrEngine();
 
+    private boolean eof = false;
+
 
     public StreamFile(String fileName) {
         try {
@@ -110,12 +113,13 @@ public class StreamFile {
 
     public boolean load() throws IOException {
         records.clear();
-        while (sf.available() >= 4) {
+        while (sf.available() >= 4 && !eof) {
 //        while (bis.available() >= 4) {
             Map<String, String> record = readRecord();
             if (record != null && !record.isEmpty()) {
                 records.add(record);
             }
+
         }
         return !records.isEmpty();
     }
@@ -201,9 +205,18 @@ public class StreamFile {
     }
 
     public String readLine() throws IOException {
-        int length = sf.readInt();
+        int length = 0;
+        try {
+            length = sf.readInt();
+        } catch (BufferUnderflowException e) {
+            eof = true;
+            return null;
+        }
 //        fpr += 4;
-        if (length < 1) return null;
+        if (length < 1) {
+            eof = true;
+            return null;
+        }
 
         byte[] buffer = new byte[length];
 

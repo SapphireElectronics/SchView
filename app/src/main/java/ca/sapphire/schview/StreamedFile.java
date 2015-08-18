@@ -1,8 +1,11 @@
 package ca.sapphire.schview;
 
+import android.util.Log;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -16,12 +19,15 @@ import java.util.List;
  * the buffer is compacted and a new sector read into the buffer after what is already there
  */
 
+
 public class StreamedFile {
+    public static final String TAG = "FileStream";
+    public static final int BUFFER_SECTORS = 4;
+
     RandomAccessFile raf;
     List<Integer> sectorList;
     int currentSector;
     int sectorSize;
-    byte[] bytes;
     byte[] transfer;
     ByteBuffer bb;
     boolean eof = false;
@@ -32,15 +38,13 @@ public class StreamedFile {
         this.sectorSize = sectorSize;
         currentSector = 0;
         transfer = new byte[sectorSize];
-        bb = ByteBuffer.allocate( sectorSize*2 );
+        bb = ByteBuffer.allocate(sectorSize * BUFFER_SECTORS);
         bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.limit( 0 );
 
         try {
             seekToNextSector();
-            readSector();
-            readSector();
-            bb.position( 0 );
-
+            check();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,49 +61,53 @@ public class StreamedFile {
     }
 
     public void readBytes( byte[] buf, int bytesToRead ) throws IOException {
-        bb.get( buf, 0, bytesToRead );
+        try {
+            bb.get( buf, 0, bytesToRead );
+        } catch (BufferUnderflowException e) {
+            Log.e(TAG, "ByteBuffer is too small.");
+            Log.e(TAG, "Position, Limit: " + bb.position() + ", " + bb.limit());
+            Log.e(TAG, "Size request: " + bytesToRead );
+            e.printStackTrace();
+            throw e;
+        }
         check();
     }
 
     public void check() throws IOException {
-        if( bb.position() >= sectorSize ) {
-            bb.compact();
+        // don't bother compacting if only a few bytes have been read.
+        if( eof || ( bb.position() < 16 ) )
+            return;
+
+        bb.compact();
+
+        // Compact puts buffer into Write mode, fill as much as possible
+        while( ( bb.limit() - bb.position() ) >= sectorSize ) {
             readSector();
-            bb.position( 0 );
         }
+
+        bb.flip();
     }
 
     private void seekToNextSector() throws IOException {
-        if( currentSector >= sectorList.size() ) {
-            eof = true;
-            return;
+        if( currentSector < sectorList.size() ) {
+            raf.seek(512 + sectorList.get(currentSector++) * sectorSize);
         }
-
-        raf.seek(512 + sectorList.get(currentSector++ ) * sectorSize );
+        else {
+            Log.i(TAG, "At EOF");
+            eof = true;
+        }
     }
 
     public void readSector() throws IOException {
-        // seek has already been done so just need to read and transfer to the bytebuffer
+        // seek has already been done so just need to read and transfer to the byte buffer
         if( eof ) return;
         try {
-            // see if there's a full sector to read
+            // read sector, transfer it to byte buffer, then seek to next sector
             raf.readFully( transfer );
             bb.put( transfer );
-            // seek to the next sector, hopefully will lower occurrence of blocking.
-            // if next sector doesn't exist we're at the end of the file
             seekToNextSector();
         } catch (EOFException e) {
-            // got here because there's not a full sector left to read
-            // read bytes until we get to EOF (bytesRead = -1)
-            int bytesRead;
-            while( (bytesRead = raf.read( transfer) ) > 0 )
-            {
-                bb.put( transfer, 0, bytesRead );
-            }
-            // set the size of the buffer to only be the amount of data remaining to EOF
-            // this makes it so the remaining() function works properly
-            bb.limit( bb.remaining() );
-            eof = true;
+            Log.e( TAG, "Attempted read past end of file.");
         }
     }
 }
