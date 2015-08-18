@@ -6,11 +6,9 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ca.sapphire.altium.Attribute;
@@ -71,16 +69,14 @@ public class StreamFile {
     public final static String TAG = "StreamFile";
     BufferedInputStream bis;
     StreamedFile sf;
-    public List<Map<String, String>> records = new ArrayList<>();
     public int recordNumber = 0;
-//    public int fpr = 0;
 
     public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
+    public ArrayList<ca.sapphire.altium.SchObject> newObjects = new ArrayList<>();
     boolean multiPartComponent = false;
     public GrEngine grEngine = new GrEngine();
 
     private boolean eof = false;
-
 
     public StreamFile(String fileName) {
         try {
@@ -90,44 +86,33 @@ public class StreamFile {
         }
 
         try {
-            load();
+            while (sf.available() >= 4 && !eof) {
+                readRecord();
+            }
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
 
         }
 
         Log.i(TAG, "Records read: " + recordNumber);
-//        Log.i(TAG, "File bytePointer: " + fpr );
     }
 
     public StreamFile( StreamedFile sf ) {
         this.sf = sf;
         try {
-            load();
+            while (sf.available() >= 4 && !eof) {
+                readRecord();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         Log.i(TAG, "Records read: " + recordNumber);
-
     }
 
-    public boolean load() throws IOException {
-        records.clear();
-        while (sf.available() >= 4 && !eof) {
-//        while (bis.available() >= 4) {
-            Map<String, String> record = readRecord();
-            if (record != null && !record.isEmpty()) {
-                records.add(record);
-            }
-
-        }
-        return !records.isEmpty();
-    }
-
-    public Map<String, String> readRecord() throws IOException {
+    public void readRecord() throws IOException {
         String line = readLine();
 
-        if (line == null) return null;
+        if (line == null) return;
 
         Map<String, String> result = new HashMap<>();
 
@@ -139,7 +124,6 @@ public class StreamFile {
             String[] data = pair.split("=");
             if (data.length == 2) {
                 result.put(data[0], data[1]);
-//                Log.i( TAG, "Data: " + data[0]);
             }
         }
 
@@ -160,13 +144,13 @@ public class StreamFile {
                     objects.add( new Text( result ));
                     break;
                 case 6:
-                    objects.add( new CompMultiLine( result ));
+                    newObjects.add( new CompMultiLine( result ));
                     break;
                 case 7:
                     objects.add( new CompPoly( result ));
                     break;
                 case 13:
-                    objects.add( new CompLine( result, multiPartComponent ));
+                    newObjects.add( new CompLine( result, multiPartComponent ));
                     break;
                 case 14:
                     objects.add( new CompBox( result ));
@@ -178,10 +162,10 @@ public class StreamFile {
                     objects.add( new Designator( result ));
                     break;
                 case 26:
-                    objects.add( new Bus( result ));
+                    newObjects.add( new Bus( result ));
                     break;
                 case 27:
-                    objects.add( new Wire( result ));
+                    newObjects.add( new Wire( result ));
                     break;
                 case 29:
                     objects.add( new Junction( result ));
@@ -201,18 +185,16 @@ public class StreamFile {
             }
         }
         recordNumber++;
-        return result;
     }
 
     public String readLine() throws IOException {
-        int length = 0;
+        int length;
         try {
             length = sf.readInt();
         } catch (BufferUnderflowException e) {
             eof = true;
             return null;
         }
-//        fpr += 4;
         if (length < 1) {
             eof = true;
             return null;
@@ -222,32 +204,9 @@ public class StreamFile {
 
         sf.readBytes( buffer, length );
 
-//        fpr += length;
-
         if (buffer[0] == 0) return null;
 
         return new String(buffer).split("\u0000")[0];
-//        int length = readInt();
-////        fpr += 4;
-//        if (length < 1) return null;
-//
-//        byte[] buffer = new byte[length];
-//
-//        if (bis.read(buffer, 0, length) != length) {
-//            Log.i(TAG, "Didn't read enough bytes");
-//        }
-////        fpr += length;
-//
-//        if (buffer[0] == 0) return null;
-//
-//        return new String(buffer).split("\u0000")[0];
-    }
-
-    public int readInt() throws IOException {
-        return (((int) (bis.read() & 0xff)) |
-                ((int) (bis.read() & 0xff) << 8) |
-                ((int) (bis.read() & 0xff) << 16) |
-                ((int) (bis.read() & 0xff) << 24));
     }
 }
 

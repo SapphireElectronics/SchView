@@ -9,10 +9,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium Component Line multi-segment line
  */
-public class CompMultiLine  implements Object {
+public class CompMultiLine  implements SchObject {
     int color;
     Point point[];
 
@@ -23,14 +25,10 @@ public class CompMultiLine  implements Object {
     }
 
     @Override
-    public void draw( Canvas canvas, Paint paint ) {
-        paint.setColor( color );
+    public void render( GrEngine engine ) {
         for (int i = 0; i < point.length-1; i++)
-            canvas.drawLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, paint );
+            engine.addLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, color, 0 );
     }
-
-    @Override
-    public void render() {}
 
     @Override
     public void read(DataInputStream dis) throws IOException {}

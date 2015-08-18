@@ -6,27 +6,14 @@ import android.graphics.Paint;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Map;
+
+import ca.sapphire.graphics.GrEngine;
 
 /**
- * Interface for an Altium Object
+ * New interface for Altium Schematic Objects
  */
-public interface Object {
-    int recordNumber = -1;
-    /**
-     * Make the object ready for drawing.
-     *
-     * Does all pre-calculations and stores the generated data for later fast drawing.
-     */
-    void render();
-
-    /**
-     * Draws the object to the Canvas using the Paint object
-     *
-     * @param canvas : Canvas to draw on
-     * @param paint : paint object to use
-     */
-    void draw( Canvas canvas, Paint paint );
+public interface SchObject {
+    void render( GrEngine engine);
 
     /**
      * Read the object from the specified file.
@@ -48,4 +35,5 @@ public interface Object {
      * @throws IOException
      */
     void write( DataOutputStream dos ) throws IOException;
+
 }

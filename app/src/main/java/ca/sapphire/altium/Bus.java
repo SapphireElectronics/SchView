@@ -9,10 +9,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium Wire multi-segment object
  */
-public class Bus implements Object {
+public class Bus implements SchObject {
     int color;
     Point point[];
 
@@ -23,17 +25,10 @@ public class Bus implements Object {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setColor( color );
-        float strokeWidth = paint.getStrokeWidth();
-        paint.setStrokeWidth(3);
-        for (int i = 0; i < point.length-1; i++)
-            canvas.drawLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, paint );
-        paint.setStrokeWidth( strokeWidth );
+    public void render( GrEngine engine ) {
+         for (int i = 0; i < point.length-1; i++)
+             engine.addLine( point[i].x, point[i].y, point[i+1].x, point[i+1].y, color, 3 );
     }
-
-    @Override
-    public void render() {}
 
     @Override
     public void read(DataInputStream dis) throws IOException {}

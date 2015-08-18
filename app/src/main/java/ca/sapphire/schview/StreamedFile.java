@@ -44,7 +44,7 @@ public class StreamedFile {
 
         try {
             seekToNextSector();
-            check();
+            fillBuffer();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,13 +75,17 @@ public class StreamedFile {
 
     public void check() throws IOException {
         // don't bother compacting if only a few bytes have been read.
-        if( eof || ( bb.position() < 16 ) )
+        if (eof || (bb.position() < 16))
             return;
 
+        fillBuffer();
+    }
+
+    private void fillBuffer() throws IOException {
         bb.compact();
 
         // Compact puts buffer into Write mode, fill as much as possible
-        while( ( bb.limit() - bb.position() ) >= sectorSize ) {
+        while( !eof && (( bb.limit() - bb.position() ) >= sectorSize ) ) {
             readSector();
         }
 
@@ -93,7 +97,6 @@ public class StreamedFile {
             raf.seek(512 + sectorList.get(currentSector++) * sectorSize);
         }
         else {
-            Log.i(TAG, "At EOF");
             eof = true;
         }
     }

@@ -32,8 +32,8 @@ public class Line implements GraphicsObject {
     }
 
     public void draw( Canvas canvas, Paint paint ) {
-        paint.setColor( Utility.altiumToRGB(color) );
-        canvas.drawLine(x1, y1, x2, y2, paint);
+//        paint.setColor( Utility.altiumToRGB(color) );
+//        canvas.drawLine(x1, y1, x2, y2, paint);
     }
 }
 

@@ -1,11 +1,15 @@
 package ca.sapphire.schview;
 
 /**
- * Todo: rework file reader to avoid temporary file
+ * Todo: refactor compound file reader
  * Todo: fix text rotations and orientations (rotating is only a hack, and that's only for Attribute
- * Todo: make basic and advanced versions (for distribution) based on what is viewed
+ * Todo: make basic and advanced versions (for distribution) based on what is viewable
  * Todo: add selectable input file
- * Todo: add title block
+ * Todo: add title block, check for standard block, add text
+ * Todo: refactor drawing and rendering to move into Engine
+ * Todo: long press does not centre properly but does set correct zoom
+ * Todo: add preferences to open last file viewed if one is not selected
+ * Todo: add preference to set long press zoom and double tap zoom
  *
  *
  * Restructure operations:
@@ -268,11 +272,17 @@ public class SchViewActivity extends Activity {
             gestureDetector = new GestureDetector(getContext(), new GestureListener());
 
             Options.INSTANCE.render(cf.sf.grEngine);
+            Options.INSTANCE.render();
 
             for (ca.sapphire.altium.Object object : cf.sf.objects) {
-                Options.INSTANCE.render();
                 object.render();
             }
+
+            for (ca.sapphire.altium.SchObject object : cf.sf.newObjects) {
+                object.render( cf.sf.grEngine );
+            }
+
+
             cf.sf.grEngine.render();
             schRect = new RectF( 0, 0, Options.INSTANCE.xSheet, Options.INSTANCE.ySheet );
         }

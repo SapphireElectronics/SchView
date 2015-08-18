@@ -8,10 +8,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium Component Line single segment line
  */
-public class CompLine extends SchBase implements Object {
+public class CompLine extends SchBase implements SchObject {
     int x1, y1, x2, y2, color;
     boolean drawable = true;
 
@@ -30,15 +32,11 @@ public class CompLine extends SchBase implements Object {
     }
 
     @Override
-    public void draw( Canvas canvas, Paint paint ) {
+    public void render( GrEngine engine ) {
         if( !drawable )
             return;
-        paint.setColor( color );
-        canvas.drawLine( x1, y1, x2, y2, paint );
+        engine.addLine( x1, y1, x2, y2, color, 0 );
     }
-
-    @Override
-    public void render() {}
 
     @Override
     public void read(DataInputStream dis) throws IOException {}

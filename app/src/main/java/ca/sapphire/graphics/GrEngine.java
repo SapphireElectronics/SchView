@@ -16,6 +16,7 @@ public class GrEngine {
     // Graphics Lines:  List of lines, sorted by color.
     public Map<Integer, List<Float>> lines = new android.support.v4.util.ArrayMap<>();
     public Map<Integer, List<TextString>> texts = new android.support.v4.util.ArrayMap<>();
+//    public Map<Integer, List<>>
 
     float[][] floatArray;
 
@@ -47,12 +48,20 @@ public class GrEngine {
     }
 
     public void addText( String text, float x, float y, int color, float size ) {
+            addText( text, x, y, color, size, Halign.LEFT, Valign.BOTTOM );
+    }
+
+    public void addText( String text, float x, float y, int color, float size, Halign hAlign, Valign vAlign ) {
         int paintIndex = getPaintIndex( color, size );
 
         if( !texts.containsKey( paintIndex ))
             texts.put( paintIndex, new ArrayList<TextString>() );
 
-        texts.get( paintIndex ).add( new TextString(text, x, y, color, size ) );
+        TextString ts = new TextString(text, x, y, color, size );
+        ts.hAlign( hAlign );
+        ts.vAlign( vAlign );
+
+        texts.get( paintIndex ).add(ts);
     }
 
     public void render() {
@@ -112,7 +121,11 @@ public class GrEngine {
         return paintList.size()-1;
     }
 
+    public static enum Halign { LEFT, CENTER, RIGHT };
+    public static enum Valign { TOP, CENTER, BOTTOM };
+
     class TextString {
+
         float x, y, size;
         int color;
         String text;
@@ -123,6 +136,14 @@ public class GrEngine {
             this.y = y;
             this.color = color;
             this.size = size;
+        }
+
+        public void hAlign( Halign hAlign ) {
+
+        }
+
+        public void vAlign( Valign vAlign ) {
+
         }
     }
 }
