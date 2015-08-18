@@ -6,6 +6,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +69,7 @@ import ca.sapphire.graphics.GrEngine;
 public class StreamFile {
     public final static String TAG = "StreamFile";
     BufferedInputStream bis;
+    StreamedFile sf;
     public List<Map<String, String>> records = new ArrayList<>();
     public int recordNumber = 0;
 //    public int fpr = 0;
@@ -93,12 +95,23 @@ public class StreamFile {
 
         Log.i(TAG, "Records read: " + recordNumber);
 //        Log.i(TAG, "File bytePointer: " + fpr );
+    }
+
+    public StreamFile( StreamedFile sf ) {
+        this.sf = sf;
+        try {
+            load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.i(TAG, "Records read: " + recordNumber);
 
     }
 
     public boolean load() throws IOException {
         records.clear();
-        while (bis.available() >= 4) {
+        while (sf.available() >= 4) {
+//        while (bis.available() >= 4) {
             Map<String, String> record = readRecord();
             if (record != null && !record.isEmpty()) {
                 records.add(record);
@@ -188,20 +201,33 @@ public class StreamFile {
     }
 
     public String readLine() throws IOException {
-        int length = readInt();
+        int length = sf.readInt();
 //        fpr += 4;
         if (length < 1) return null;
 
         byte[] buffer = new byte[length];
 
-        if (bis.read(buffer, 0, length) != length) {
-            Log.i(TAG, "Didn't read enough bytes");
-        }
+        sf.readBytes( buffer, length );
+
 //        fpr += length;
 
         if (buffer[0] == 0) return null;
 
         return new String(buffer).split("\u0000")[0];
+//        int length = readInt();
+////        fpr += 4;
+//        if (length < 1) return null;
+//
+//        byte[] buffer = new byte[length];
+//
+//        if (bis.read(buffer, 0, length) != length) {
+//            Log.i(TAG, "Didn't read enough bytes");
+//        }
+////        fpr += length;
+//
+//        if (buffer[0] == 0) return null;
+//
+//        return new String(buffer).split("\u0000")[0];
     }
 
     public int readInt() throws IOException {

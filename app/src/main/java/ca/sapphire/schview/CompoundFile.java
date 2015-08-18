@@ -38,19 +38,21 @@ public class CompoundFile {
 
     int sectorBytes;
 
+    StreamedFile sdf;
     StreamFile sf;
 
     public boolean done = false;
 
     public CompoundFile( String fileName ) {
         // check to see if file has already been converted by comparing file dates
-        String streamFileName = fileName + ".str";
-        if( new File(streamFileName).lastModified() < new File(fileName).lastModified())
-        {
-            parse( fileName );
-        }
+//        String streamFileName = fileName + ".str";
+//        if( new File(streamFileName).lastModified() < new File(fileName).lastModified())
+//        {
+//            parse( fileName );
+//        }
+//        sf = new StreamFile( streamFileName );
+        parse( fileName );
 
-        sf = new StreamFile( streamFileName );
         done = true;
     }
 
@@ -179,9 +181,11 @@ public class CompoundFile {
         }
 
         // make sure manifest allows write to external storage or this will fail.
-        String streamFileName = fileName + ".str";
-        writeFile( streamFileName, raf, cfs.sectorList );
-//        writeFile( streamFileName, raf, fileID );
+//        String streamFileName = fileName + ".str";
+//        writeFile( streamFileName, raf, cfs.sectorList );
+
+        sdf = new StreamedFile( raf, cfs.sectorList, sectorBytes );
+        sf = new StreamFile( sdf );
 
         try {
             raf.close();

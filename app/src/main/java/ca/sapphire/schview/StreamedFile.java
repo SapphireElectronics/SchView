@@ -26,22 +26,21 @@ public class StreamedFile {
     ByteBuffer bb;
     boolean eof = false;
 
-    public void StreamedFile( RandomAccessFile raf, List<Integer> sectorList, int sectorSize ) {
+    public StreamedFile( RandomAccessFile raf, List<Integer> sectorList, int sectorSize ) {
         this.raf = raf;
         this.sectorList = sectorList;
         this.sectorSize = sectorSize;
         currentSector = 0;
-        bytes = new byte[sectorSize*2];
         transfer = new byte[sectorSize];
-        bb = ByteBuffer.wrap( bytes );
-
+        bb = ByteBuffer.allocate( sectorSize*2 );
         bb.order(ByteOrder.LITTLE_ENDIAN);
 
         try {
             seekToNextSector();
             readSector();
-            seekToNextSector();
             readSector();
+            bb.position( 0 );
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,7 +63,9 @@ public class StreamedFile {
 
     public void check() throws IOException {
         if( bb.position() >= sectorSize ) {
+            bb.compact();
             readSector();
+            bb.position( 0 );
         }
     }
 
@@ -74,14 +75,12 @@ public class StreamedFile {
             return;
         }
 
-        raf.seek( 512 + sectorList.get( currentSector++ ) * sectorSize );
+        raf.seek(512 + sectorList.get(currentSector++ ) * sectorSize );
     }
 
     public void readSector() throws IOException {
         // seek has already been done so just need to read and transfer to the bytebuffer
-        if( !eof ) return;
-
-        bb.compact();
+        if( eof ) return;
         try {
             // see if there's a full sector to read
             raf.readFully( transfer );
@@ -102,6 +101,5 @@ public class StreamedFile {
             bb.limit( bb.remaining() );
             eof = true;
         }
-        bb.position( 0 );
     }
 }
