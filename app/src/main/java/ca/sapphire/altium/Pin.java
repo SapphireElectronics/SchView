@@ -16,7 +16,7 @@ import ca.sapphire.graphics.Text;
 /**
  * Contains an Altium pin
  */
-public class Pin extends SchBase implements Object {
+public class Pin extends SchBase implements SchObject {
     public static final int PIN_INVISIBLE = 0b00100;
     public static final int NAME_VISIBLE = 0b01000;
     public static final int DESIGNATOR_VISIBLE = 0b10000;
@@ -32,7 +32,7 @@ public class Pin extends SchBase implements Object {
 
     GrEngine engine;
 
-    public Pin( Map<String, String> record, boolean multiPartComponent, GrEngine engine ) {
+    public Pin( Map<String, String> record, boolean multiPartComponent ) {
 
 //    public Pin( Map<String, String> record, boolean multiPartComponent  ) {
         super(record);
@@ -60,31 +60,6 @@ public class Pin extends SchBase implements Object {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {
-//        if( !drawable )
-//            return;
-//
-//        if( (option & PIN_INVISIBLE) > 0 )
-//            return;
-//
-//        paint.setColor(color);
-//        canvas.drawLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, paint);
-//
-//        paint.setTextSize(textSize);
-//
-//        if( (option & NAME_VISIBLE) > 0 )
-//            nameTag.draw(canvas, paint);
-//
-//        if( (option & DESIGNATOR_VISIBLE) > 0 )
-//            desTag.draw(canvas, paint);
-    }
-
-    @Override
-    public void render() {
-        render( engine );
-    }
-
-//    @Override
     public void render( GrEngine engine ) {
         if( !drawable )
             return;
@@ -99,53 +74,51 @@ public class Pin extends SchBase implements Object {
         nameTextpt = new PointF( x-5, y );
         Utility.rotate(nameTextpt, pnt1, orientation );
 
-        desTextpt = new PointF( x+length, y );
+        desTextpt = new PointF( x+8, y );
         Utility.rotate(desTextpt, pnt1, orientation );
 
-        // TODO check designator (pin number) orientation in Altium
-        switch( orientation ) {
-            case 0:
-                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.CENTER );
-                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.LEFT, Text.Valign.BOTTOM );
-                break;
-            case 1:
-                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.CENTER, Text.Valign.TOP );
-                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.LEFT, Text.Valign.BOTTOM );
-                break;
-            case 2:
-                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.LEFT, Text.Valign.CENTER );
-                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
-                break;
-            case 3:
-                nameTag = new Text( name, nameTextpt, color, textSize, Text.Halign.CENTER, Text.Valign.BOTTOM );
-                desTag = new Text( designator, desTextpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
-                break;
-        }
-
+//        // TODO check designator (pin number) orientation in Altium
         if( !drawable )
             return;
 
         if( (option & PIN_INVISIBLE) > 0 )
             return;
 
-//        paint.setColor(color);
-//        canvas.drawLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, paint);
-//
-//        paint.setTextSize(textSize);
-//
-//        if( (option & NAME_VISIBLE) > 0 )
-//            nameTag.draw(canvas, paint);
-//
-//        if( (option & DESIGNATOR_VISIBLE) > 0 )
-//            desTag.draw(canvas, paint);
-
         engine.addLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, color, 0);
 
-        if( (option & NAME_VISIBLE) > 0 )
-            engine.addText( name, nameTag.draw.x, nameTag.draw.y, color, textSize );
+        if( (option & NAME_VISIBLE) > 0 ) {
+            switch( orientation ) {
+                case 0:
+                    engine.addText(name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.CENTER);
+                    break;
+                case 1:
+                    engine.addText( name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.TOP );
+                    break;
+                case 2:
+                    engine.addText( name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.CENTER );
+                    break;
+                case 3:
+                    engine.addText( name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.BOTTOM );
+                    break;
+            }
+        }
 
-        if( (option & DESIGNATOR_VISIBLE) > 0 )
-            engine.addText( designator, desTag.draw.x, desTag.draw.y, color, textSize );
+        if( (option & DESIGNATOR_VISIBLE) > 0 ) {
+            switch( orientation ) {
+                case 0:
+                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.BOTTOM );
+                    break;
+                case 1:
+                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.BOTTOM );
+                    break;
+                case 2:
+                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.BOTTOM );
+                    break;
+                case 3:
+                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.BOTTOM );
+                    break;
+            }
+        }
     }
 
     @Override

@@ -10,12 +10,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
 import ca.sapphire.graphics.Text;
 
 /**
  * Contains an Altium text attribute
  */
-public class Attribute extends SchBase implements Object {
+public class Attribute extends SchBase implements SchObject {
     int x, y, color, justification, orientation, fontId;
     String name;
     boolean hidden;
@@ -36,17 +37,20 @@ public class Attribute extends SchBase implements Object {
         hidden = Utility.getBooleanValue(record, "ISHIDDEN", false);
     }
 
-    @Override
-    public void draw(Canvas canvas, Paint paint) {
-        if( hidden )
-            return;
-        paint.setTextSize(textSize);
-        paint.setColor( color );
-        tag.draw( canvas, paint );
-    }
+//    @Override
+//    public void draw(Canvas canvas, Paint paint) {
+//        if( hidden )
+//            return;
+//        paint.setTextSize(textSize);
+//        paint.setColor( color );
+//        tag.draw( canvas, paint );
+//    }
 
     @Override
-    public void render() {
+    public void render( GrEngine engine ) {
+        if( hidden || name == null )
+            return;
+
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
         textpt = new PointF( x, y );
@@ -56,31 +60,31 @@ public class Attribute extends SchBase implements Object {
 
         switch( justification ) {
             case 0: // Bottom Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.LEFT, ca.sapphire.graphics.Text.Valign.BOTTOM );
+                engine.addText(name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.BOTTOM);
                 break;
             case 1: // Bottom Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.CENTER, ca.sapphire.graphics.Text.Valign.BOTTOM );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.BOTTOM );
                 break;
             case 2: // Bottom Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.RIGHT, ca.sapphire.graphics.Text.Valign.BOTTOM );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.BOTTOM );
                 break;
             case 3: // Centre Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.LEFT, ca.sapphire.graphics.Text.Valign.CENTER );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.CENTER );
                 break;
             case 4: // Centre Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.CENTER, ca.sapphire.graphics.Text.Valign.CENTER );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
                 break;
             case 5: // Centre Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.RIGHT, ca.sapphire.graphics.Text.Valign.CENTER );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.CENTER );
                 break;
             case 6: // Top Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.LEFT, ca.sapphire.graphics.Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.TOP );
                 break;
             case 7: // Top Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.CENTER, ca.sapphire.graphics.Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.TOP );
                 break;
             case 8: // Top Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, ca.sapphire.graphics.Text.Halign.RIGHT, ca.sapphire.graphics.Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.TOP );
                 break;
         }
 

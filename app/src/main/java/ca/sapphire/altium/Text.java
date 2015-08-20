@@ -8,10 +8,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium text object
  */
-public class Text implements Object {
+public class Text implements SchObject {
     int x, y, fontId, color;
     String text;
 
@@ -25,16 +27,17 @@ public class Text implements Object {
         text = record.get("TEXT");
     }
 
-    @Override
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setColor(color);
-        paint.setTextSize(textSize);
-        canvas.drawText(text, x, y, paint);
-    }
+//    @Override
+//    public void draw(Canvas canvas, Paint paint) {
+//        paint.setColor(color);
+//        paint.setTextSize(textSize);
+//        canvas.drawText(text, x, y, paint);
+//    }
 
     @Override
-    public void render() {
+    public void render( GrEngine engine ) {
         textSize = Options.INSTANCE.fontSize[fontId-1];
+        engine.addText( text, x, y, color, textSize );
     }
 
     @Override

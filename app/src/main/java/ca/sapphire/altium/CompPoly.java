@@ -10,10 +10,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium Component polygon
  */
-public class CompPoly implements Object {
+public class CompPoly implements SchObject {
     int size, lineColor, areaColor;
     Point[] point;
 
@@ -28,20 +30,23 @@ public class CompPoly implements Object {
         Utility.xyToJava(point);
     }
 
-    @Override
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor( areaColor );
-        canvas.drawPath( path, paint );
+//    @Override
+//    public void draw(Canvas canvas, Paint paint) {
+//        paint.setStyle(Paint.Style.FILL);
+//        paint.setColor( areaColor );
+//        canvas.drawPath( path, paint );
+//
+//        paint.setStyle(Paint.Style.STROKE);
+//        paint.setColor( lineColor );
+//        canvas.drawPath( path, paint );
+//    }
 
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor( lineColor );
-        canvas.drawPath( path, paint );
-    }
-
     @Override
-    public void render() {
+    public void render( GrEngine engine ) {
         path = Utility.polygon( point );
+
+        engine.addPath( path, areaColor, true );
+        engine.addPath( path, lineColor, false );
     }
 
     @Override

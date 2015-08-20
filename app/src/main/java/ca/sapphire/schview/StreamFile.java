@@ -71,7 +71,7 @@ public class StreamFile {
     StreamedFile sf;
     public int recordNumber = 0;
 
-    public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
+//    public ArrayList<ca.sapphire.altium.Object> objects = new ArrayList<>();
     public ArrayList<ca.sapphire.altium.SchObject> newObjects = new ArrayList<>();
     boolean multiPartComponent = false;
     public GrEngine grEngine = new GrEngine();
@@ -133,33 +133,33 @@ public class StreamFile {
             switch (Integer.parseInt(record)) {
                 case 1:
                     Component component = new Component( result );
-                    objects.add( component );
+                    newObjects.add( component );
                     if( component.displayModeCount > 1)
                         multiPartComponent = true;
                     break;
                 case 2:
-                    objects.add( new Pin( result, multiPartComponent, grEngine ));
+                    newObjects.add( new Pin( result, multiPartComponent ));
                     break;
                 case 4:
-                    objects.add( new Text( result ));
+                    newObjects.add( new Text( result ));
                     break;
                 case 6:
                     newObjects.add( new CompMultiLine( result ));
                     break;
                 case 7:
-                    objects.add( new CompPoly( result ));
+                    newObjects.add( new CompPoly( result ));
                     break;
                 case 13:
                     newObjects.add( new CompLine( result, multiPartComponent ));
                     break;
                 case 14:
-                    objects.add( new CompBox( result ));
+                    newObjects.add( new CompBox( result ));
                     break;
                 case 17:
-                    objects.add( new PowerPort( result ) );
+                    newObjects.add( new PowerPort( result ) );
                     break;
                 case 25:
-                    objects.add( new Designator( result ));
+                    newObjects.add( new Designator( result ));
                     break;
                 case 26:
                     newObjects.add( new Bus( result ));
@@ -168,19 +168,19 @@ public class StreamFile {
                     newObjects.add( new Wire( result ));
                     break;
                 case 29:
-                    objects.add( new Junction( result ));
+                    newObjects.add( new Junction( result ));
                     break;
                 case 31:
                     Options.INSTANCE.put(result);
                     break;
                 case 34:
-                    objects.add(new Designator(result));
+                    newObjects.add(new Designator(result));
                     break;
                 case 37:
-                    objects.add( new Entry( result ));
+                    newObjects.add( new Entry( result ));
                     break;
                 case 41:
-                    objects.add( new Attribute( result ));
+                    newObjects.add( new Attribute( result ));
                     break;
             }
         }

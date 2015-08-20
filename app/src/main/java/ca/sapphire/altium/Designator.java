@@ -9,12 +9,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
 import ca.sapphire.graphics.Text;
 
 /**
  * Contains an Altium reference designator
  */
-public class Designator extends SchBase implements Object {
+public class Designator extends SchBase implements SchObject {
     int x, y, color, justification, orientation, fontId;
     String name;
 
@@ -33,15 +34,15 @@ public class Designator extends SchBase implements Object {
         fontId = Utility.getByteValue(record, "FONTID", (byte) 1);
     }
 
-    @Override
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setTextSize(textSize);
-        paint.setColor( color );
-        tag.draw( canvas, paint );
-    }
+//    @Override
+//    public void draw(Canvas canvas, Paint paint) {
+//        paint.setTextSize(textSize);
+//        paint.setColor( color );
+//        tag.draw( canvas, paint );
+//    }
 
     @Override
-    public void render() {
+    public void render( GrEngine engine ) {
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
         textpt = new PointF( x, y );
@@ -49,31 +50,31 @@ public class Designator extends SchBase implements Object {
 
         switch( justification ) {
             case 0: // Bottom Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.BOTTOM );
+                engine.addText(name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.BOTTOM);
                 break;
             case 1: // Bottom Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.BOTTOM );
                 break;
             case 2: // Bottom Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.BOTTOM );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.BOTTOM );
                 break;
             case 3: // Centre Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.CENTER );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.CENTER );
                 break;
             case 4: // Centre Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.CENTER );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
                 break;
             case 5: // Centre Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.CENTER );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.CENTER );
                 break;
             case 6: // Top Left
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.TOP );
                 break;
             case 7: // Top Centre
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.TOP );
                 break;
             case 8: // Top Right
-                tag = new ca.sapphire.graphics.Text( name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.TOP );
                 break;
         }
     }

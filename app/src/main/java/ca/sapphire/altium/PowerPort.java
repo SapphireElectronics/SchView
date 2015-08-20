@@ -9,12 +9,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
 import ca.sapphire.graphics.Text;
 
 /**
  * Contains an Altium Power Port object
  */
-public class PowerPort implements Object {
+public class PowerPort implements SchObject {
     // data to read and write
     int x, y, color;
     byte style, rotation, fontId;
@@ -40,16 +41,16 @@ public class PowerPort implements Object {
         name = record.get("TEXT");
     }
 
-    @Override
-    public void draw(Canvas canvas, Paint paint) {
-        paint.setTextSize(textSize);
-        paint.setColor(color);
-        tag.draw(canvas, paint);
-
-        for (int i = 0; i < linepts.length; i+=2) {
-            canvas.drawLine( linepts[i].x, linepts[i].y, linepts[i+1].x, linepts[i+1].y, paint );
-        }
-    }
+//    @Override
+//    public void draw(Canvas canvas, Paint paint) {
+//        paint.setTextSize(textSize);
+//        paint.setColor(color);
+//        tag.draw(canvas, paint);
+//
+//        for (int i = 0; i < linepts.length; i+=2) {
+//            canvas.drawLine( linepts[i].x, linepts[i].y, linepts[i+1].x, linepts[i+1].y, paint );
+//        }
+//    }
 
 
     /**
@@ -74,7 +75,7 @@ public class PowerPort implements Object {
      */
 
     @Override
-    public void render() {
+    public void render( GrEngine engine ) {
         // TODO: Add all rendering types
         // Currently only renders bar, arrow
 
@@ -110,25 +111,28 @@ public class PowerPort implements Object {
         for( PointF point : linepts )
             Utility.rotate( point, linepts[0], rotation );
 
+            for (int i = 0; i < linepts.length; i+=2)
+                engine.addLine(linepts[i].x, linepts[i].y, linepts[i + 1].x, linepts[i + 1].y, color);
+
+
         Utility.rotate(textpt, linepts[0], rotation);
 
         switch( rotation ) {
             case 0:
-                tag = new Text( name, textpt, color, textSize, Text.Halign.LEFT, Text.Valign.CENTER );
+                engine.addText(name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.CENTER);
                 break;
 
             case 1:
-                tag = new Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.BOTTOM );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.BOTTOM );
                 break;
 
             case 2:
-                tag = new Text(name, textpt, color, textSize, Text.Halign.RIGHT, Text.Valign.CENTER);
+                engine.addText(name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.CENTER);
                 break;
 
             case 3:
-                tag = new Text( name, textpt, color, textSize, Text.Halign.CENTER, Text.Valign.TOP );
+                engine.addText( name, textpt.x, textpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.TOP );
                 break;
-
         }
     }
 

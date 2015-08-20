@@ -8,10 +8,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium component
  */
-public class Component extends SchBase implements Object {
+public class Component extends SchBase implements SchObject {
     public int displayModeCount;
 
     public Component( Map<String, String> record ) {
@@ -20,10 +22,7 @@ public class Component extends SchBase implements Object {
     }
 
     @Override
-    public void draw(Canvas canvas, Paint paint) {}
-
-    @Override
-    public void render() {}
+    public void render( GrEngine engine ) {}
 
     @Override
     public void read(DataInputStream dis) throws IOException {}

@@ -10,10 +10,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
 
+import ca.sapphire.graphics.GrEngine;
+
 /**
  * Contains an Altium component filled body
  */
-public class CompBox implements Object {
+public class CompBox implements SchObject {
     Point[] point;
     int lineColor, fillColor;
 
@@ -34,25 +36,28 @@ public class CompBox implements Object {
         point[3] = new Point( point[2].x, point[0].y );
     }
 
+//    @Override
+//    public void draw(Canvas canvas, Paint paint) {
+//        if( !draw )
+//            return;
+//
+//        paint.setStyle(Paint.Style.FILL);
+//        paint.setColor( fillColor );
+//        canvas.drawPath( path, paint );
+//
+//        paint.setStyle(Paint.Style.STROKE);
+//        paint.setColor( lineColor );
+//        canvas.drawPath( path, paint );
+//    }
+
     @Override
-    public void draw(Canvas canvas, Paint paint) {
+    public void render( GrEngine engine ) {
         if( !draw )
             return;
 
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor( fillColor );
-        canvas.drawPath( path, paint );
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor( lineColor );
-        canvas.drawPath( path, paint );
-    }
-
-    @Override
-    public void render() {
-        if( !draw )
-            return;
         path = Utility.polygon( point );
+        engine.addPath( path, fillColor, true );
+        engine.addPath( path, lineColor, false );
     }
     @Override
     public void read(DataInputStream dis) throws IOException {}

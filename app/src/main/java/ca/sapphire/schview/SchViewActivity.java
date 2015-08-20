@@ -274,14 +274,13 @@ public class SchViewActivity extends Activity {
             Options.INSTANCE.render(cf.sf.grEngine);
             Options.INSTANCE.render();
 
-            for (ca.sapphire.altium.Object object : cf.sf.objects) {
-                object.render();
-            }
+//            for (ca.sapphire.altium.Object object : cf.sf.objects) {
+//                object.render();
+//            }
 
             for (ca.sapphire.altium.SchObject object : cf.sf.newObjects) {
                 object.render( cf.sf.grEngine );
             }
-
 
             cf.sf.grEngine.render();
             schRect = new RectF( 0, 0, Options.INSTANCE.xSheet, Options.INSTANCE.ySheet );
@@ -348,12 +347,12 @@ public class SchViewActivity extends Activity {
 
             Options.INSTANCE.draw(canvas, paint);
 
-            for (ca.sapphire.altium.Object object : cf.sf.objects) {
-//                Options.INSTANCE.render();
-//                object.render();
-//                Options.INSTANCE.draw(canvas, paint);
-                object.draw(canvas, paint);
-            }
+//            for (ca.sapphire.altium.Object object : cf.sf.objects) {
+////                Options.INSTANCE.render();
+////                object.render();
+////                Options.INSTANCE.draw(canvas, paint);
+//                object.draw(canvas, paint);
+//            }
 
 //            cf.sf.grEngine.render();
             cf.sf.grEngine.draw(canvas, paint);

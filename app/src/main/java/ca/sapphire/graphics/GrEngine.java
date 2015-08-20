@@ -2,6 +2,8 @@ package ca.sapphire.graphics;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,8 @@ public class GrEngine {
     // Graphics Lines:  List of lines, sorted by color.
     public Map<Integer, List<Float>> lines = new android.support.v4.util.ArrayMap<>();
     public Map<Integer, List<TextString>> texts = new android.support.v4.util.ArrayMap<>();
-//    public Map<Integer, List<>>
+    public List<Shape> shapes = new ArrayList<>();
+    public List<Circle> circles = new ArrayList<>();
 
     float[][] floatArray;
 
@@ -48,20 +51,34 @@ public class GrEngine {
     }
 
     public void addText( String text, float x, float y, int color, float size ) {
-            addText( text, x, y, color, size, Halign.LEFT, Valign.BOTTOM );
+            addText(text, x, y, color, size, Halign.LEFT, Valign.BOTTOM);
     }
 
     public void addText( String text, float x, float y, int color, float size, Halign hAlign, Valign vAlign ) {
+//        if( text == null ) {
+//            text = ".";
+//            return;
+//        }
+
         int paintIndex = getPaintIndex( color, size );
 
         if( !texts.containsKey( paintIndex ))
             texts.put( paintIndex, new ArrayList<TextString>() );
 
         TextString ts = new TextString(text, x, y, color, size );
-        ts.hAlign( hAlign );
-        ts.vAlign( vAlign );
+        ts.hAlign(hAlign);
+        ts.vAlign(vAlign);
 
         texts.get( paintIndex ).add(ts);
+    }
+
+    public void addPath( Path path, int color, boolean filled ) {
+        Shape shape = new Shape( path, color, filled );
+        shapes.add(shape);
+    }
+
+    public void addCircle( float x, float y, float radius, int color ) {
+        circles.add( new Circle( x, y, radius, color ) );
     }
 
     public void render() {
@@ -82,6 +99,13 @@ public class GrEngine {
 
     public void draw( Canvas canvas, Paint paint) {
         int arrayPt=0;
+        for( Shape shape : shapes ) {
+            canvas.drawPath( shape.path, shape.paint );
+        }
+
+        for( Circle circle : circles )
+            canvas.drawCircle(circle.x, circle.y, circle.radius, circle.paint );
+
         for (Map.Entry<Integer, List<Float>> entry : lines.entrySet()) {
 //            paint.setColor( entry.getKey() );
             canvas.drawLines( floatArray[arrayPt++], paintList.get( entry.getKey() ) );
@@ -90,9 +114,14 @@ public class GrEngine {
         for( Map.Entry<Integer, List<TextString>> entry : texts.entrySet() ) {
             Paint newpaint = paintList.get( entry.getKey() );
             for( TextString ts : entry.getValue() ) {
-                canvas.drawText( ts.text, ts.x, ts.y, newpaint );
+//                try {
+                    canvas.drawText( ts.text, ts.x, ts.y, newpaint );
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
         }
+
     }
 
     public int getPaintIndex( int color, int width ) {
@@ -125,10 +154,11 @@ public class GrEngine {
     public static enum Valign { TOP, CENTER, BOTTOM };
 
     class TextString {
-
         float x, y, size;
         int color;
         String text;
+        Rect bounds = new Rect();
+        Paint paint = new Paint();
 
         public TextString( String text, float x, float y, int color, float size ) {
             this.text = text;
@@ -139,11 +169,56 @@ public class GrEngine {
         }
 
         public void hAlign( Halign hAlign ) {
+            paint.setTextSize( size );
+            paint.getTextBounds( text, 0, text.length(), bounds );
 
+            switch( hAlign ) {
+                case CENTER:
+                    x -= bounds.exactCenterX();
+                    break;
+                case RIGHT:
+                    x -= ( bounds.width() + 1 );
+            }
         }
 
         public void vAlign( Valign vAlign ) {
+            paint.setTextSize( size );
+            paint.getTextBounds( text, 0, text.length(), bounds );
 
+            switch( vAlign ) {
+                case TOP:
+                    y += bounds.height();
+                    break;
+                case CENTER:
+                    y -= bounds.exactCenterY();
+            }
+        }
+    }
+
+    class Shape {
+        Path path;
+        Paint paint;
+
+        public Shape( Path path, int color, boolean filled ) {
+            this.path = path;
+            paint = new Paint();
+            paint.setColor( color );
+            paint.setStrokeWidth(0);
+            paint.setStyle(filled ? Paint.Style.FILL : Paint.Style.STROKE);
+        }
+    }
+
+    class Circle {
+        float x, y, radius;
+        Paint paint;
+
+        public Circle( float x, float y, float radius, int color ) {
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            paint = new Paint();
+            paint.setColor( color );
+            paint.setStrokeWidth( 0 );
         }
     }
 }
