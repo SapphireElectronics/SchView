@@ -20,6 +20,7 @@ import ca.sapphire.altium.CompPoly;
 import ca.sapphire.altium.Component;
 import ca.sapphire.altium.Designator;
 import ca.sapphire.altium.Entry;
+import ca.sapphire.altium.Field;
 import ca.sapphire.altium.Junction;
 import ca.sapphire.altium.Options;
 import ca.sapphire.altium.Pin;
@@ -114,6 +115,8 @@ public class StreamFile {
 
         if (line == null) return;
 
+        parseRecord(line);
+
         Map<String, String> result = new HashMap<>();
 
         String pairs[] = line.split("\\|");
@@ -207,6 +210,33 @@ public class StreamFile {
         if (buffer[0] == 0) return null;
 
         return new String(buffer).split("\u0000")[0];
+    }
+
+    public void parseRecord( String line ) {
+//        Map<String, String> result = new HashMap<>();
+
+        String pairs[] = line.split("\\|");
+
+        for (String pair : pairs) {
+            if (pair.trim().isEmpty()) continue;
+
+            String[] data = pair.split("=");
+            if (data.length == 2) {
+
+                Field field;
+
+                try {
+                    field = Field.valueOf( data[0]) ;
+                    Log.i( TAG, "Field: " + field.getType() );
+                    //yes
+                } catch (IllegalArgumentException ex) {
+                    //nope
+                }
+
+
+//                result.put(data[0], data[1]);
+            }
+        }
     }
 }
 
