@@ -36,6 +36,8 @@ public class Text implements SchObject {
 
     @Override
     public void render( GrEngine engine ) {
+        if( text == null )
+            return;
         textSize = Options.INSTANCE.fontSize[fontId-1];
         engine.addText( text, x, y, color, textSize );
     }

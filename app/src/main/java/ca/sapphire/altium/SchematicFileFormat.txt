@@ -54,48 +54,60 @@ Enumerated List:
 [ 2] Pin
 [ 3]
 [ 4] Text
-[ 5]
-[ 6] Component: Multiline
-[ 7] Component: Polygon
-[ 8]
-[ 9]
-[10]
-[11]
-[12] Component: Arc/Circle
-[13] Component: Lines
-[14] Component: Area
-[15]
-[16]
-[17] power Port
-[18]
+[ 5] Bezier
+[ 6] Multiline
+[ 7] Polygon (filled)
+[ 8] Ellipse (filled)
+[ 9] Pie Cart (filled)
+[10] Rounded Rectangle (filled)
+[11] Elliptical Arc
+[12] Arc / Circle
+[13] Lines
+[14] Area (filled)
+[15] Sheet Designator Graphic
+[16] Sheet Entry
+[17] Power Port / Offsheet Connector
+[18] Port
 [19]
 [20]
 [21]
-[22]
+[22] No ERC
 [23]
 [24]
 [25] Net Name
 [26] Bus
 [27] Wire
-[28]
-[29] Junction
-[30]
-[31] Options ??
-[32]
-[33]
+[28] Text Frame
+[29] Junction Manual / Juntion Automatic
+[30] Graphic
+[31] Options
+[32] Sheet Designator
+[33] Sheet Filename
 [34] Designator
 [35]
 [36]
 [37] Bus Entry
 [38]
-[39]
+[39] ??
 [40]
 [41] Attribute
 [42]
-[43]
+[43] Directive
 [44] ??
-[45] ??
+[45] Model Information
 [46] ??
-[47]
+[47] ??
 [48] ??
+[209] Note
+[210] Probe
+[211] Compile Mask
+[215] Harness Connector
+[216] Harness Entry
+[217] Harness Connector Name
+[218] Harness
+[220] C Code
+[221] C Code Entry
+[222] C Code Designator
+[223] C Code File Name
+[226] Hyperlink
 

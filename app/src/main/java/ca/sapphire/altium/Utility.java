@@ -1,5 +1,6 @@
 package ca.sapphire.altium;
 
+import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -82,7 +83,11 @@ public abstract class Utility {
     }
 
     static public int getColor( Map<String, String> record ) {
-        return altiumToRGB(Integer.parseInt(record.get("COLOR")));
+        String color = record.get( "COLOR" );
+        if( color == null )
+            return Color.BLACK;
+
+        return altiumToRGB(Integer.parseInt(color));
     }
 
 
@@ -205,6 +210,15 @@ public abstract class Utility {
             point[i].x = Integer.parseInt((String) record.get("X" + String.valueOf(i + 1)));
             point[i].y = Integer.parseInt((String) record.get("Y" + String.valueOf(i + 1)));
         }
+
+        return point;
+    }
+
+    static public PointF addLocation( Map<String, String> record) {
+        PointF point = new PointF();
+
+        point.x = Float.parseFloat( "0" + record.get( "LOCATION.X") + "." + record.get( "LOCATION.X_FRAC") );
+        point.y = Float.parseFloat( "0" + record.get( "LOCATION.Y") + "." + record.get( "LOCATION.Y_FRAC") );
 
         return point;
     }

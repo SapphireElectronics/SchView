@@ -24,4 +24,6 @@ public class SchBase{
         if (record.get("INDEXINSHEET") != null)
             ownerIndex = Utility.getIntValue(record, "INDEXINSHEET");
     }
+
+
 }

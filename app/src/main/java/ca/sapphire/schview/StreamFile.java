@@ -119,7 +119,7 @@ public class StreamFile {
 
         if (line == null) return;
 
-        parseRecord(line);
+//        parseRecord(line);
 
         Map<String, String> result = new HashMap<>();
 
@@ -156,6 +156,8 @@ public class StreamFile {
                 case 7:
                     newObjects.add( new CompPoly( result ));
                     break;
+                case 12:
+                    newObjects.add( new Arc( result ));
                 case 13:
                     newObjects.add( new CompLine( result, multiPartComponent ));
                     break;

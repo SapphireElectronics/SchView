@@ -11,6 +11,24 @@ package ca.sapphire.schview;
  * Todo: add preferences to open last file viewed if one is not selected
  * Todo: add preference to set long press zoom and double tap zoom
  *
+ * Todo: Check assumtion of using Black for unspecified colours.
+ * Todo: Support all standard sheet sizes
+ * Todo: Think about incorporating fling
+ *
+ * Based on C1YC schematic
+ * Todone: Sheet border: same number of divisions on x and y, but y should only be 4
+ * Todone: Sheet border: should be letters on y axis
+ * Todone: Sheet border: no letters at all on right edge
+ * Todo: Title block fixed text not appearing (text is null)
+ * Todo: Title block schematic text not appearing (text is null)
+ * Todo: Arcs not rendered in parts
+ * Todo: Ports not rendered
+ * Todo: Earth ground not rendered with correct symbol
+ * Todo: Pin numbers (eg D4) not rendered at correct orientation
+ * Todo: J2 and J3 text not quite placed correctly
+ * Todo: Long push not centering on push location when zooming.
+ * Todo: NoERC not rendered.
+ *
  *
  * Restructure operations:
  *
@@ -28,6 +46,8 @@ package ca.sapphire.schview;
  * B can be eliminated as it's strictly not needed, we can parse the current record, then discard it.
  * C can be reduced unless we intend to use the data in an editor (so comment the code, only keep what is needed for rendering.)
  * D is of course what we need to save in a quickly renderable format in the graphics engine.
+ *
+ * (A), (B) eliminated.  (C) is retained for processing.  (D) is being optimized into a rendering engine.
  */
 
 
@@ -233,7 +253,8 @@ public class SchViewActivity extends Activity {
 
     public void viewFile() {
         viewHandler.postDelayed(viewRunnable, 100);
-        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
+//        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
+        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
     }
 
     public void showFile( CompoundFile cf ) {

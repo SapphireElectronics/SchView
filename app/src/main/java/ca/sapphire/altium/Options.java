@@ -24,7 +24,7 @@ public enum Options implements Object {
     public static final int[] xSheetConst = { 0, 0, 0, 0, 0, 950, 1500 };
     public static final int[] ySheetConst = { 0, 0, 0, 0, 0, 750, 950 };
     public static final int[] xZonesConst = { 0, 0, 0, 0, 0, 4, 6 };
-    public static final int[] yZonesConst = { 0, 0, 0, 0, 0, 4, 6 };
+    public static final int[] yZonesConst = { 0, 0, 0, 0, 0, 4, 4 };
 
     boolean customSheet, titleBlockOn;
 
@@ -84,26 +84,6 @@ public enum Options implements Object {
 
     @Override
     public void draw( Canvas canvas, Paint paint ) {
-//        paint.setColor(0xff404040);
-//
-//        paint.setTextSize( fontSize[0] );
-//
-//        for (int i = 0; i < xZones; i++) {
-//            int xLoc = (2*i+1)*xSheet/(xZones*2);
-//            Text tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, yMargin/2 ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw(canvas, paint);
-//            tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, ySheet-yMargin/2 ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw(canvas, paint);
-//        }
-//
-//        for (int i = 0; i < yZones; i++) {
-//            int yLoc = (2*i+1)*ySheet/(yZones*2);
-//            String ch = Character.toString ((char) ((yZones-i)+64));
-//            Text tag = new Text( ch, new PointF( xMargin/2, yLoc ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw( canvas, paint );
-//            tag = new Text( ch, new PointF( xMargin-xMargin/2, yLoc ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw(canvas, paint);
-//        }
     }
 
     @Override
@@ -138,25 +118,15 @@ public enum Options implements Object {
             int xLoc = (2*i+1)*xSheet/(xZones*2);
             engine.addText( String.valueOf( i+1 ), xLoc, yMargin/2, tColor, tSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
             engine.addText( String.valueOf( i+1 ), xLoc, ySheet-yMargin/2, tColor, tSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
-
-//            Text tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, yMargin/2 ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw(canvas, paint);
-//            tag = new Text( String.valueOf( i+1 ), new PointF( xLoc, ySheet-yMargin/2 ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw(canvas, paint);
         }
 
+        int character = 64 + yZones;
         for (int i = 0; i < yZones; i++) {
             int yLoc = (2*i+1)*ySheet/(yZones*2);
-            String ch = Character.toString ((char) ((yZones-i)+64));
+            String ch = Character.toString ((char) (character--));
 
-            engine.addText( String.valueOf( i+1 ), xMargin/2, yLoc, tColor, tSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
-            engine.addText( String.valueOf( i+1 ), xMargin-xMargin/2, yLoc, tColor, tSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
-
-
-//            Text tag = new Text( ch, new PointF( xMargin/2, yLoc ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw( canvas, paint );
-//            tag = new Text( ch, new PointF( xMargin-xMargin/2, yLoc ), 0xff404040, fontSize[0], Text.Halign.CENTER, Text.Valign.CENTER );
-//            tag.draw(canvas, paint);
+            engine.addText( ch, xMargin/2, yLoc, tColor, tSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
+            engine.addText( ch, xSheet-xMargin/2, yLoc, tColor, tSize, GrEngine.Halign.CENTER, GrEngine.Valign.CENTER );
         }
 
         // standard title block
