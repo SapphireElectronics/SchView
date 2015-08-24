@@ -4,17 +4,20 @@ package ca.sapphire.altium;
  * Created by apreston on 8/20/2015.
  */
 
+
 enum Type {
     SHORT, INT, STRING;
 }
 
 public enum Field {
-    OWNERINDEX( "OWNERINDEX", Type.SHORT ),
-    COLOR( "COLOR", Type.INT ),
-    LOCATION_X( "LOCATION.X", Type.INT ),
-    LOCATION_Y( "LOCATION.Y", Type.INT ),
-    CORNER_X( "CORNER.X", Type.INT ),
-    CORNER_Y( "CORNER.Y", Type.INT );
+    RECORD( "RECORD", Type.SHORT, 2 ),
+    OWNERINDEX( "OWNERINDEX", Type.SHORT, 2 ),
+    COLOR( "COLOR", Type.INT, 1 ),
+    LOCATION_X( "LOCATION.X", Type.INT, 1 ),
+    LOCATION_Y( "LOCATION.Y", Type.INT, 1 ),
+    CORNER_X( "CORNER.X", Type.INT, 1 ),
+    CORNER_Y( "CORNER.Y", Type.INT, 1 ),
+    LINEWIDTH( "LINEWIDTH", Type.INT, 1 );
 
 //    OWNERPARTID( "OWNERPARTID" ),
 //    FORMALTYPE( "FORMALTYPE" ),
@@ -37,11 +40,13 @@ public enum Field {
 //    public final int number;
     public final String name;
     public final Type type;
+    public final int primitive;
 
 
-    Field( String name, Type type ) {
+    Field( String name, Type type, int primitive ) {
         this.name = name;
         this.type = type;
+        this.primitive = primitive;
     }
 //    Field( int number, String name ) {
 //        this.number = number;
@@ -59,4 +64,9 @@ public enum Field {
     public Type getType() {
         return type;
     }
+
+    public int getPrimitive() {
+        return primitive;
+    }
+
 }

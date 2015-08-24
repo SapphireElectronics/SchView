@@ -1,6 +1,7 @@
 package ca.sapphire.schview;
 
 import android.util.Log;
+import android.util.SparseIntArray;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -8,7 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ca.sapphire.altium.Attribute;
@@ -78,6 +81,7 @@ public class StreamFile {
     public GrEngine grEngine = new GrEngine();
 
     private boolean eof = false;
+
 
     public StreamFile(String fileName) {
         try {
@@ -215,6 +219,8 @@ public class StreamFile {
     public void parseRecord( String line ) {
 //        Map<String, String> result = new HashMap<>();
 
+        SparseIntArray intArray = new SparseIntArray();
+
         String pairs[] = line.split("\\|");
 
         for (String pair : pairs) {
@@ -227,7 +233,13 @@ public class StreamFile {
 
                 try {
                     field = Field.valueOf( data[0]) ;
-                    Log.i( TAG, "Field: " + field.getType() );
+                    if( field.getPrimitive() == 1) {
+                        int val = Integer.parseInt( data[1] );
+                        intArray.append(field.ordinal(), val );
+
+                    }
+                    if( data[0].equals( "RECORD") && data[1].equals( "37" ) )
+                        Log.i( TAG, "Field: " + field.getType() );
                     //yes
                 } catch (IllegalArgumentException ex) {
                     //nope

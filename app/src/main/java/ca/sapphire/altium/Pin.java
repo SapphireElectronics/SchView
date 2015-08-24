@@ -42,7 +42,7 @@ public class Pin extends SchBase implements SchObject {
         length = Integer.parseInt(record.get("PINLENGTH"));
 //        designator = Integer.parseInt(record.get("DESIGNATOR"));
         option = Integer.parseInt(record.get("PINCONGLOMERATE"));
-//        color = Utility.getColor(record);
+        color = Utility.getColor(record);
         name = record.get("NAME");
         if( name == null )
             name = "";
@@ -67,7 +67,6 @@ public class Pin extends SchBase implements SchObject {
         pnt1 = new PointF( x, y );
         pnt2 = new PointF(x+length, y );
         Utility.rotate( pnt2, pnt1, orientation );
-        color = 0xff000000;
 
         textSize = Options.INSTANCE.fontSize[fontId-1];
 

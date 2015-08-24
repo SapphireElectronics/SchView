@@ -22,6 +22,9 @@ public class Entry implements SchObject {
         x2 = Integer.parseInt(record.get("CORNER.X"));
         y2 = -Integer.parseInt(record.get("CORNER.Y"));
         color = Utility.getColor(record);
+
+
+
     }
 //    public void draw( Canvas canvas, Paint paint ) {
 //        paint.setColor( color );
