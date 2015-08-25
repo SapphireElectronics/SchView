@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ca.sapphire.altium.Arc;
@@ -81,6 +82,9 @@ public class StreamFile {
 
     private boolean eof = false;
 
+    public List<String> flds = new ArrayList<>();
+    public List<String> subFlds = new ArrayList<>();
+
 
     public StreamFile(String fileName) {
         try {
@@ -118,7 +122,7 @@ public class StreamFile {
 
         if (line == null) return;
 
-//        parseRecord(line);
+        parseRecord(line);
 
         Map<String, String> result = new HashMap<>();
 
@@ -237,22 +241,29 @@ public class StreamFile {
 
             String[] data = pair.split("=");
             if (data.length == 2) {
+                String[] sub = data[0].split(".");
 
-                Field field;
+                if( !flds.contains( data[0]))
+                    flds.add( data[0] );
 
-                try {
-                    field = Field.valueOf( data[0]) ;
-                    if( field.getPrimitive() == 1) {
-                        int val = Integer.parseInt( data[1] );
-                        intArray.append(field.ordinal(), val );
+                if( !subFlds.contains( sub[0]))
+                    subFlds.add( sub[0] );
 
-                    }
-                    if( data[0].equals( "RECORD") && data[1].equals( "37" ) )
-                        Log.i( TAG, "Field: " + field.getType() );
-                    //yes
-                } catch (IllegalArgumentException ex) {
-                    //nope
-                }
+
+//                Field field;
+//                try {
+//                    field = Field.valueOf( data[0]) ;
+//                    if( field.getPrimitive() == 1) {
+//                        int val = Integer.parseInt( data[1] );
+//                        intArray.append(field.ordinal(), val );
+//
+//                    }
+//                    if( data[0].equals( "RECORD") && data[1].equals( "37" ) )
+//                        Log.i( TAG, "Field: " + field.getType() );
+//                    //yes
+//                } catch (IllegalArgumentException ex) {
+//                    //nope
+//                }
 
 
 //                result.put(data[0], data[1]);
