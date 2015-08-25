@@ -9,11 +9,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import ca.sapphire.altium.Arc;
 import ca.sapphire.altium.Attribute;
 import ca.sapphire.altium.Bus;
 import ca.sapphire.altium.CompBox;
@@ -131,10 +130,17 @@ public class StreamFile {
             String[] data = pair.split("=");
             if (data.length == 2) {
                 result.put(data[0], data[1]);
+//                if( data[0].equals( "ENDANGLE") ) {
+//                    Log.i( TAG, "Endangle");
+//                }
             }
         }
 
         String record = result.get("RECORD");
+
+// todo: Check to see when multipartcomponent is set to false
+// todo: Handle multipartcomponent a little nicer.
+
 
         if (record != null) {
             switch (Integer.parseInt(record)) {
@@ -157,7 +163,8 @@ public class StreamFile {
                     newObjects.add( new CompPoly( result ));
                     break;
                 case 12:
-                    newObjects.add( new Arc( result ));
+                    newObjects.add( new Arc( result, multiPartComponent ));
+                    break;
                 case 13:
                     newObjects.add( new CompLine( result, multiPartComponent ));
                     break;

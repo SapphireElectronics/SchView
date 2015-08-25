@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class GrEngine {
     public Map<Integer, List<TextString>> texts = new android.support.v4.util.ArrayMap<>();
     public List<Shape> shapes = new ArrayList<>();
     public List<Circle> circles = new ArrayList<>();
+    public List<Arc> arcs = new ArrayList<>();
 
     float[][] floatArray;
 
@@ -81,6 +83,10 @@ public class GrEngine {
         circles.add( new Circle( x, y, radius, color ) );
     }
 
+    public void addArc( float x, float y, float radius, float startAngle, float endAngle, int color ) {
+        arcs.add( new Arc( x, y, radius, startAngle, endAngle, color ));
+    }
+
     public void render() {
         floatArray = new float[lines.size()][];
 
@@ -105,6 +111,9 @@ public class GrEngine {
 
         for( Circle circle : circles )
             canvas.drawCircle(circle.x, circle.y, circle.radius, circle.paint );
+
+        for( Arc arc : arcs )
+            canvas.drawArc( arc.oval, arc.angle, arc.sweep, false, arc.paint );
 
         for (Map.Entry<Integer, List<Float>> entry : lines.entrySet()) {
 //            paint.setColor( entry.getKey() );
@@ -218,6 +227,22 @@ public class GrEngine {
             this.radius = radius;
             paint = new Paint();
             paint.setColor( color );
+            paint.setStrokeWidth( 0 );
+        }
+    }
+
+    class Arc {
+        RectF oval;
+        float angle, sweep;
+        Paint paint;
+
+        public Arc( float x, float y, float radius, float start, float end, int color ) {
+            oval = new RectF( x-radius, y-radius, x+radius, y+radius );
+            angle = end;
+            sweep = Math.abs( end-start );
+            paint = new Paint();
+            paint.setColor( color );
+            paint.setStyle(Paint.Style.STROKE );
             paint.setStrokeWidth( 0 );
         }
     }

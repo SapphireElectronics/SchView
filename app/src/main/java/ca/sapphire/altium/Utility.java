@@ -82,6 +82,13 @@ public abstract class Utility {
         return Integer.parseInt(record.get(name));
     }
 
+    static public float getFloatValue( Map<String, String> record, String name, float defValue  ) {
+        if( record.get( name ) == null )
+            return defValue;
+        return Float.parseFloat(record.get(name));
+    }
+
+
     static public int getColor( Map<String, String> record ) {
         String color = record.get( "COLOR" );
         if( color == null )
@@ -217,8 +224,8 @@ public abstract class Utility {
     static public PointF addLocation( Map<String, String> record) {
         PointF point = new PointF();
 
-        point.x = Float.parseFloat( "0" + record.get( "LOCATION.X") + "." + record.get( "LOCATION.X_FRAC") );
-        point.y = Float.parseFloat( "0" + record.get( "LOCATION.Y") + "." + record.get( "LOCATION.Y_FRAC") );
+        point.x = Float.parseFloat( ( record.containsKey("LOCATION.X") ? record.get( "LOCATION.X") : "0" ) + "." +  ( record.containsKey("LOCATION.X_FRAC") ? record.get( "LOCATION.X_FRAC") : "0" ) );
+        point.y = Float.parseFloat( ( record.containsKey("LOCATION.Y") ? record.get( "LOCATION.Y") : "0" ) + "." +  ( record.containsKey("LOCATION.Y_FRAC") ? record.get( "LOCATION.Y_FRAC") : "0" ) );
 
         return point;
     }
