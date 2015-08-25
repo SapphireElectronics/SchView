@@ -1,23 +1,38 @@
 package ca.sapphire.altium;
 
+import android.util.SparseArray;
+
 /**
  * Created by apreston on 8/20/2015.
  */
 
 
-enum Type {
-    SHORT, INT, STRING;
-}
 
 public enum Field {
-    RECORD( "RECORD", Type.SHORT, 2 ),
-    OWNERINDEX( "OWNERINDEX", Type.SHORT, 2 ),
-    COLOR( "COLOR", Type.INT, 1 ),
-    LOCATION_X( "LOCATION.X", Type.INT, 1 ),
-    LOCATION_Y( "LOCATION.Y", Type.INT, 1 ),
-    CORNER_X( "CORNER.X", Type.INT, 1 ),
-    CORNER_Y( "CORNER.Y", Type.INT, 1 ),
-    LINEWIDTH( "LINEWIDTH", Type.INT, 1 );
+    RECORD( Type.SHORT ),
+    OWNERINDEX( Type.SHORT ),
+    COLOR( Type.INT ),
+    LOCATION_X( Type.INT ),
+    LOCATION_Y( Type.INT ),
+    CORNER_X( Type.INT ),
+    CORNER_Y( Type.INT ),
+    LINEWIDTH( Type.INT );
+
+
+
+//    RECORD( "RECORD", Type.SHORT ),
+//    OWNERINDEX( "OWNERINDEX", Type.SHORT ),
+//    COLOR( "COLOR", Type.INT ),
+//    LOCATION_X( "LOCATION.X", Type.INT ),
+//    LOCATION_Y( "LOCATION.Y", Type.INT ),
+//    CORNER_X( "CORNER.X", Type.INT ),
+//    CORNER_Y( "CORNER.Y", Type.INT ),
+//    LINEWIDTH( "LINEWIDTH", Type.INT );
+
+    public enum Type {
+        SHORT, INT, STRING;
+    }
+
 
 //    OWNERPARTID( "OWNERPARTID" ),
 //    FORMALTYPE( "FORMALTYPE" ),
@@ -38,35 +53,25 @@ public enum Field {
 
 
 //    public final int number;
-    public final String name;
+//    public final String name;
     public final Type type;
-    public final int primitive;
+//    public final int primitive;
 
 
-    Field( String name, Type type, int primitive ) {
-        this.name = name;
+    Field( Type type ) {
         this.type = type;
-        this.primitive = primitive;
     }
-//    Field( int number, String name ) {
-//        this.number = number;
+
+//    Field( String name, Type type ) {
 //        this.name = name;
+//        this.type = type;
 //    }
 
-//    public int getNumber() {
-//        return number;
+//    public String getName() {
+//        return name;
 //    }
-
-    public String getName() {
-        return name;
-    }
 
     public Type getType() {
         return type;
     }
-
-    public int getPrimitive() {
-        return primitive;
-    }
-
 }

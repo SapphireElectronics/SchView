@@ -1,6 +1,7 @@
 package ca.sapphire.schview;
 
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.SparseIntArray;
 
 import java.io.BufferedInputStream;
@@ -230,9 +231,22 @@ public class StreamFile {
     }
 
     public void parseRecord( String line ) {
+
+/**
+ * Pros and Cons for "pre parse"
+ *
+ * Cons:
+ * - large enum for all field names
+ *
+ * Pros:
+ * - can process data on a field by field basis, no need to search for an optional
+ *      parameter that may not exist
+ * - all data "quirks" are accounted for in one place
+ */
 //        Map<String, String> result = new HashMap<>();
 
-        SparseIntArray intArray = new SparseIntArray();
+        SparseIntArray saInt = new SparseIntArray();
+//        SparseArray sa = new SparseArray();
 
         String pairs[] = line.split("\\|");
 
@@ -241,29 +255,42 @@ public class StreamFile {
 
             String[] data = pair.split("=");
             if (data.length == 2) {
-                String[] sub = data[0].split(".");
+//                String[] sub = data[0].split("\\.");
+
+                data[0] = data[0].replaceAll( "%UTF8%", "" ).replaceAll("\\.", "_");
+//                data[0] = data[0].replaceAll( "%UTF8%", "" );
+
+//                if( data[0].contains("\\d+$")) {
+                if( data[0].matches(".*\\d+$")) {
+                    String sdata[] = data[0].split("\\d+$");
+                    data[0] = sdata[0];
+                }
 
                 if( !flds.contains( data[0]))
                     flds.add( data[0] );
 
-                if( !subFlds.contains( sub[0]))
-                    subFlds.add( sub[0] );
+//                if( !subFlds.contains( sub[0]))
+//                    subFlds.add( sub[0] );
 
-
-//                Field field;
-//                try {
-//                    field = Field.valueOf( data[0]) ;
-//                    if( field.getPrimitive() == 1) {
-//                        int val = Integer.parseInt( data[1] );
-//                        intArray.append(field.ordinal(), val );
+//                if( sub[0].contains( "\\d+$")) {
 //
-//                    }
-//                    if( data[0].equals( "RECORD") && data[1].equals( "37" ) )
-//                        Log.i( TAG, "Field: " + field.getType() );
-//                    //yes
-//                } catch (IllegalArgumentException ex) {
-//                    //nope
 //                }
+
+                Field field;
+                try {
+                    field = Field.valueOf( data[0]) ;
+                    switch( field.getType() ) {
+                        case INT:
+                            saInt.put( field.ordinal(), Integer.parseInt( data[1] ) );
+                            break;
+                    }
+
+                    if( data[0].equals( "RECORD") && data[1].equals( "37" ) )
+                        Log.i( TAG, "Field: " + field.getType() );
+                    //yes
+                } catch (IllegalArgumentException ex) {
+                    //nope
+                }
 
 
 //                result.put(data[0], data[1]);
