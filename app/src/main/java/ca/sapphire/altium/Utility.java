@@ -221,6 +221,17 @@ public abstract class Utility {
         return point;
     }
 
+    static public void addMultiLine( Map<String, String> record, float[] x, float[] y) {
+        for (int i = 0; i < x.length; i++) {
+            String nameX = "X" + String.valueOf(i+1);
+            String nameY = "Y" + String.valueOf(i+1);
+            x[i] = Float.parseFloat( record.get( nameX ));
+            y[i] = Float.parseFloat( record.get( nameY ));
+//            x[i] = Float.parseFloat( record.get("X" + String.valueOf(i+1)));
+//            y[i] = Float.parseFloat((String) record.get("Y" + String.valueOf(i+1)));
+        }
+    }
+
     static public PointF addLocation( Map<String, String> record) {
         PointF point = new PointF();
 

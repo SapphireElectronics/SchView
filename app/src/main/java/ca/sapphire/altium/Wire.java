@@ -26,9 +26,12 @@ public class Wire implements SchObject {
     }
 
     public Wire( Map<String, String> record ) {
-//        point = Utility.addMultiLine(record);
-//        Utility.xyToJava( point );
-//        color = Utility.getColor(record);
+        int size = Integer.parseInt(record.get("LOCATIONCOUNT"));
+        x = new float[size];
+        y = new float[size];
+
+        Utility.addMultiLine( record, x, y );
+        color = Utility.getColor(record);
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,6 +90,10 @@ public class StreamFile {
 
     public List<String> missingFields = new ArrayList<>();
 
+    byte[] buffer = new byte[1024];
+    Map<String, String> result = new HashMap<>();
+
+
 
     public StreamFile(String fileName) {
         try {
@@ -110,6 +115,8 @@ public class StreamFile {
     }
 
     public StreamFile( StreamedFile sf ) {
+        long startTime = System.currentTimeMillis();
+
         this.sf = sf;
         try {
             while (sf.available() >= 4 && !eof) {
@@ -118,6 +125,9 @@ public class StreamFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Log.i( TAG, "Process time: " + (System.currentTimeMillis() - startTime ) );
+
         Log.i( TAG, "Missing fields:" + missingFields );
         Log.i(TAG, "Records read: " + recordNumber);
     }
@@ -127,21 +137,15 @@ public class StreamFile {
 
         if (line == null) return;
 
-        parseRecord(line);
+//        parseRecord(line);
 
-        Map<String, String> result = new HashMap<>();
-
+        result.clear();
         String pairs[] = line.split("\\|");
 
         for (String pair : pairs) {
-            if (pair.trim().isEmpty()) continue;
-
             String[] data = pair.split("=");
             if (data.length == 2) {
                 result.put(data[0], data[1]);
-//                if( data[0].equals( "ENDANGLE") ) {
-//                    Log.i( TAG, "Endangle");
-//                }
             }
         }
 
@@ -190,22 +194,21 @@ public class StreamFile {
                     newObjects.add( new Bus( result ));
                     break;
                 case 27:
-                    newObjects.add( new Wire() );
-//                    newObjects.add( new Wire( result ));
+//                    newObjects.add( new Wire() );
+                    newObjects.add( new Wire( result ));
                     break;
                 case 29:
                     newObjects.add( new Junction( result ));
                     break;
-//                case 31:
-//                    Options.INSTANCE.put(result);
-//                    break;
+                case 31:
+                    Options.INSTANCE.put(result);
+                    break;
                 case 34:
                     newObjects.add(new Designator(result));
                     break;
                 case 37:
-                    newObjects.add( new Entry());
-//                    newObjects.add( new Entry( saInt, saFloat, saBool, saStr ));
-//                    newObjects.add( new Entry( result ));
+//                    newObjects.add( new Entry());
+                    newObjects.add( new Entry( result ));
                     break;
                 case 41:
                     newObjects.add( new Attribute( result ));
@@ -228,13 +231,10 @@ public class StreamFile {
             return null;
         }
 
-        byte[] buffer = new byte[length];
-
         sf.readBytes( buffer, length );
-
         if (buffer[0] == 0) return null;
 
-        return new String(buffer).split("\u0000")[0];
+        return new String(buffer, 0, length).trim();
     }
 
     public void parseRecord( String line ) {
@@ -265,14 +265,14 @@ public class StreamFile {
                 data[0] = data[0].trim().replaceAll("%UTF8%", "" ).replace(".", "_");
 
                 // look for field ended in a number
-                if( data[0].matches(".*\\d+$")) {
-                    String fld[] = data[0].split("\\d+$");
-                    String num = data[0].substring( fld[0].length() );
-                    int fn = Integer.parseInt( num );
-                }
+//                if( data[0].matches(".*\\d+$")) {
+//                    String fld[] = data[0].split("\\d+$");
+//                    String num = data[0].substring( fld[0].length() );
+//                    int fn = Integer.parseInt( num );
+//                }
 
-                if( !flds.contains( data[0]))
-                    flds.add( data[0] );
+//                if( !flds.contains( data[0]))
+//                    flds.add( data[0] );
 
 //                if( !subFlds.contains( sub[0]))
 //                    subFlds.add( sub[0] );
