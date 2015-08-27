@@ -2,6 +2,7 @@ package ca.sapphire.schview;
 
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
 
 import java.io.BufferedInputStream;
@@ -86,6 +87,8 @@ public class StreamFile {
     public List<String> flds = new ArrayList<>();
     public List<String> subFlds = new ArrayList<>();
 
+    public List<String> missingFields = new ArrayList<>();
+
 
     public StreamFile(String fileName) {
         try {
@@ -115,6 +118,7 @@ public class StreamFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.i( TAG, "Missing fields:" + missingFields );
         Log.i(TAG, "Records read: " + recordNumber);
     }
 
@@ -186,19 +190,22 @@ public class StreamFile {
                     newObjects.add( new Bus( result ));
                     break;
                 case 27:
-                    newObjects.add( new Wire( result ));
+                    newObjects.add( new Wire() );
+//                    newObjects.add( new Wire( result ));
                     break;
                 case 29:
                     newObjects.add( new Junction( result ));
                     break;
-                case 31:
-                    Options.INSTANCE.put(result);
-                    break;
+//                case 31:
+//                    Options.INSTANCE.put(result);
+//                    break;
                 case 34:
                     newObjects.add(new Designator(result));
                     break;
                 case 37:
-                    newObjects.add( new Entry( result ));
+                    newObjects.add( new Entry());
+//                    newObjects.add( new Entry( saInt, saFloat, saBool, saStr ));
+//                    newObjects.add( new Entry( result ));
                     break;
                 case 41:
                     newObjects.add( new Attribute( result ));
@@ -236,17 +243,17 @@ public class StreamFile {
  * Pros and Cons for "pre parse"
  *
  * Cons:
- * - large enum for all field names
+ * - large enum for all field names (about 170-180 entries)
+ * - two steps:
+ *      - convert data to sparse arrays
+ *      - convert sparse array data to specific values
  *
  * Pros:
  * - can process data on a field by field basis, no need to search for an optional
  *      parameter that may not exist
  * - all data "quirks" are accounted for in one place
  */
-//        Map<String, String> result = new HashMap<>();
-
-        SparseIntArray saInt = new SparseIntArray();
-//        SparseArray sa = new SparseArray();
+        Field.clear();
 
         String pairs[] = line.split("\\|");
 
@@ -255,15 +262,13 @@ public class StreamFile {
 
             String[] data = pair.split("=");
             if (data.length == 2) {
-//                String[] sub = data[0].split("\\.");
+                data[0] = data[0].trim().replaceAll("%UTF8%", "" ).replace(".", "_");
 
-                data[0] = data[0].replaceAll( "%UTF8%", "" ).replaceAll("\\.", "_");
-//                data[0] = data[0].replaceAll( "%UTF8%", "" );
-
-//                if( data[0].contains("\\d+$")) {
+                // look for field ended in a number
                 if( data[0].matches(".*\\d+$")) {
-                    String sdata[] = data[0].split("\\d+$");
-                    data[0] = sdata[0];
+                    String fld[] = data[0].split("\\d+$");
+                    String num = data[0].substring( fld[0].length() );
+                    int fn = Integer.parseInt( num );
                 }
 
                 if( !flds.contains( data[0]))
@@ -276,20 +281,19 @@ public class StreamFile {
 //
 //                }
 
-                Field field;
+//                Field field;
                 try {
-                    field = Field.valueOf( data[0]) ;
-                    switch( field.getType() ) {
-                        case INT:
-                            saInt.put( field.ordinal(), Integer.parseInt( data[1] ) );
-                            break;
+                    Field.put( data );
+
+                    if( Field.integers[Field.RECORD.ordinal()] == 31 ) {
+                        Options.INSTANCE.put( pairs );
+                        return;
                     }
 
-                    if( data[0].equals( "RECORD") && data[1].equals( "37" ) )
-                        Log.i( TAG, "Field: " + field.getType() );
-                    //yes
                 } catch (IllegalArgumentException ex) {
-                    //nope
+                    if( ! missingFields.contains(data[0] ) ) {
+                        missingFields.add( data[0] );
+                    }
                 }
 
 

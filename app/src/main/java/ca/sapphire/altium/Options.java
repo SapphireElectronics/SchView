@@ -9,6 +9,7 @@ import android.graphics.PointF;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import ca.sapphire.graphics.Text;
@@ -40,6 +41,21 @@ public enum Options implements Object {
     int sheetStyle = 0;
     int grid = 0;
     String fontName[];
+
+
+    public void put( String[] pairs ) {
+        Map<String, String> result = new HashMap<>();
+
+        for (String pair : pairs) {
+            if (pair.trim().isEmpty()) continue;
+
+            String[] data = pair.split("=");
+            if (data.length == 2) {
+                result.put(data[0], data[1]);
+            }
+        }
+        put( result );
+    }
 
     public void put( Map<String, String> record ) {
         customSheet = Utility.getBooleanValue(record, "VIEWCUSTOMSHEET", false);

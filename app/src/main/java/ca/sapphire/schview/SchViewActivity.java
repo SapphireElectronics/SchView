@@ -253,8 +253,8 @@ public class SchViewActivity extends Activity {
 
     public void viewFile() {
         viewHandler.postDelayed(viewRunnable, 100);
-//        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
-        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
+        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
+//        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
     }
 
     public void showFile( CompoundFile cf ) {
