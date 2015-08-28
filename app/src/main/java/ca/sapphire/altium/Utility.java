@@ -223,13 +223,21 @@ public abstract class Utility {
 
     static public void addMultiLine( Map<String, String> record, float[] x, float[] y) {
         for (int i = 0; i < x.length; i++) {
-            String nameX = "X" + String.valueOf(i+1);
-            String nameY = "Y" + String.valueOf(i+1);
-            x[i] = Float.parseFloat( record.get( nameX ));
-            y[i] = Float.parseFloat( record.get( nameY ));
-//            x[i] = Float.parseFloat( record.get("X" + String.valueOf(i+1)));
-//            y[i] = Float.parseFloat((String) record.get("Y" + String.valueOf(i+1)));
+            String nameX = "X".concat(String.valueOf(i + 1));
+            String nameY = "Y".concat(String.valueOf(i + 1));
+            String fracX = "X".concat(String.valueOf(i + 1)).concat("_FRAC");
+            String fracY = "Y".concat(String.valueOf(i + 1)).concat("_FRAC");
+
+            x[i] = Float.parseFloat(record.get(nameX) + "." + (record.containsKey(fracX) ? record.get(fracX) : "0"));
+            y[i] = Float.parseFloat(record.get(nameY) + "." + (record.containsKey(fracY) ? record.get(fracY) : "0"));
         }
+    }
+
+    static public void addLocation( Map<String, String> record, float[] x, float[] y) {
+        x[0] = Float.parseFloat(record.get("LOCATION.X") + "." + (record.containsKey("LOCATION.X_FRAC") ? record.get("LOCATION.X_FRAC") : "0"));
+        y[0] = Float.parseFloat(record.get("LOCATION.Y") + "." + (record.containsKey("LOCATION.Y_FRAC") ? record.get("LOCATION.Y_FRAC") : "0"));
+        x[1] = Float.parseFloat(record.get("CORNER.X") + "." + (record.containsKey("CORNER.X_FRAC") ? record.get("CORNER.X_FRAC") : "0"));
+        y[1] = Float.parseFloat(record.get("CORNER.Y") + "." + (record.containsKey("CORNER.Y_FRAC") ? record.get("CORNER.Y_FRAC") : "0"));
     }
 
     static public PointF addLocation( Map<String, String> record) {

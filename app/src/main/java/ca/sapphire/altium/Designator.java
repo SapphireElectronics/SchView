@@ -18,6 +18,7 @@ import ca.sapphire.graphics.Text;
 public class Designator extends SchBase implements SchObject {
     int x, y, color, justification, orientation, fontId;
     String name;
+    boolean isHidden;
 
     PointF textpt;
     float textSize;
@@ -32,6 +33,7 @@ public class Designator extends SchBase implements SchObject {
         justification = Utility.getIntValue(record, "JUSTIFICATION", 0);
         orientation = Utility.getIntValue( record, "ORIENTATION", 0);
         fontId = Utility.getByteValue(record, "FONTID", (byte) 1);
+        isHidden = Utility.getBooleanValue(record, "ISHIDDEN", false );
     }
 
 //    @Override
@@ -43,6 +45,9 @@ public class Designator extends SchBase implements SchObject {
 
     @Override
     public void render( GrEngine engine ) {
+        if( isHidden )
+            return;
+
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
         textpt = new PointF( x, y );

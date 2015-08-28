@@ -15,6 +15,8 @@ package ca.sapphire.schview;
  * Todo: Support all standard sheet sizes
  * Todo: Think about incorporating fling
  *
+ * Todone: Only show designator if not hidden.
+ *
  * Based on C1YC schematic
  * Todone: Sheet border: same number of divisions on x and y, but y should only be 4
  * Todone: Sheet border: should be letters on y axis
@@ -29,6 +31,7 @@ package ca.sapphire.schview;
  * Todo: Long push not centering on push location when zooming.
  * Todo: NoERC not rendered.
  *
+ * Todo: Add markup ability
  *
  * Restructure operations:
  *
@@ -253,7 +256,8 @@ public class SchViewActivity extends Activity {
 
     public void viewFile() {
         viewHandler.postDelayed(viewRunnable, 100);
-        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
+        cf = new CompoundFile( "/sdcard/Download/pin.SchDoc");
+//        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
 //        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
     }
 

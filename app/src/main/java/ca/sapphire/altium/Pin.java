@@ -1,8 +1,5 @@
 package ca.sapphire.altium;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 
 import java.io.DataInputStream;
@@ -11,7 +8,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import ca.sapphire.graphics.GrEngine;
-import ca.sapphire.graphics.Text;
 
 /**
  * Contains an Altium pin
@@ -23,6 +19,8 @@ public class Pin extends SchBase implements SchObject {
 
 
     int x, y, length, option, color, fontId, textSize, orientation;
+    int nameOption, nameLocation;
+    int desOption, desLocation;
     String name, designator;
 
     PointF pnt1, pnt2;
@@ -57,6 +55,14 @@ public class Pin extends SchBase implements SchObject {
             if( record.get("OWNERPARTDISPLAYMODE") != null)
                 drawable = false;
         }
+
+        nameOption = Utility.getIntValue(record, "PINNAME_POSITIONCONGLOMERATE", 0);
+        nameLocation = Utility.getIntValue(record, "NAME_CUSTOMPOSITION_MARGIN", 0);
+
+        desOption = Utility.getIntValue(record, "PINDESIGNATOR_POSITIONCONGLOMERATE", 0);
+        desLocation = Utility.getIntValue(record, "DESIGNATOR_CUSTOMPOSITION_MARGIN", 0);
+
+
     }
 
     @Override
@@ -70,10 +76,18 @@ public class Pin extends SchBase implements SchObject {
 
         textSize = Options.INSTANCE.fontSize[fontId-1];
 
-        nameTextpt = new PointF( x-5, y );
+        if( nameOption == 0)
+            nameTextpt = new PointF( x-5, y );
+        else
+            nameTextpt = new PointF( x-nameLocation, y );
+
         Utility.rotate(nameTextpt, pnt1, orientation );
 
-        desTextpt = new PointF( x+8, y );
+        if( desOption == 0 )
+            desTextpt = new PointF( x+8, y-2 );
+        else
+            desTextpt = new PointF( x+desLocation, y-2 );
+
         Utility.rotate(desTextpt, pnt1, orientation );
 
 //        // TODO check designator (pin number) orientation in Altium
@@ -118,6 +132,10 @@ public class Pin extends SchBase implements SchObject {
                     break;
             }
         }
+
+        //PINNAME_POSITIONCONGLOMERATE =1 if it exists
+        //NAME_CUSTOMPOSITION_MARGIN ==xx  offset is xx, is tag doesnt exist then xx=0
+        //PINDESIGNATOR_POSITIONCONGLOMERATE =1 if it exists
     }
 
     @Override
