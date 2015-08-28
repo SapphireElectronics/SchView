@@ -17,26 +17,23 @@ public class Pin extends SchBase implements SchObject {
     public static final int NAME_VISIBLE = 0b01000;
     public static final int DESIGNATOR_VISIBLE = 0b10000;
 
+    float x,y;
 
-    int x, y, length, option, color, fontId, textSize, orientation;
+    int length, option, color, fontId, textSize, orientation;
     int nameOption, nameLocation;
     int desOption, desLocation;
     String name, designator;
 
     PointF pnt1, pnt2;
     boolean drawable = true;
-    ca.sapphire.graphics.Text nameTag, desTag;
     PointF nameTextpt, desTextpt;
 
     GrEngine engine;
 
     public Pin( Map<String, String> record, boolean multiPartComponent ) {
-
-//    public Pin( Map<String, String> record, boolean multiPartComponent  ) {
         super(record);
-        this.engine = engine;
-        x = Utility.getIntValue(record, "LOCATION.X");
-        y = -Utility.getIntValue(record, "LOCATION.Y");
+        x = Utility.addLocationX( record );
+        y = -Utility.addLocationY( record );
         length = Integer.parseInt(record.get("PINLENGTH"));
 //        designator = Integer.parseInt(record.get("DESIGNATOR"));
         option = Integer.parseInt(record.get("PINCONGLOMERATE"));
@@ -64,6 +61,13 @@ public class Pin extends SchBase implements SchObject {
 
 
     }
+
+    // define the default alignment options given an orientation (rotation) as an index
+    public static final GrEngine.Halign nameHalign[] = { GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT, GrEngine.Halign.CENTER };
+    public static final GrEngine.Valign nameValign[] = { GrEngine.Valign.CENTER, GrEngine.Valign.TOP, GrEngine.Valign.CENTER, GrEngine.Valign.BOTTOM };
+    public static final GrEngine.Halign desHalign[] = { GrEngine.Halign.LEFT, GrEngine.Halign.LEFT, GrEngine.Halign.RIGHT, GrEngine.Halign.RIGHT };
+    public static final GrEngine.Valign desValign[] = { GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM };
+
 
     @Override
     public void render( GrEngine engine ) {
@@ -99,43 +103,11 @@ public class Pin extends SchBase implements SchObject {
 
         engine.addLine(pnt1.x, pnt1.y, pnt2.x, pnt2.y, color, 0);
 
-        if( (option & NAME_VISIBLE) > 0 ) {
-            switch( orientation ) {
-                case 0:
-                    engine.addText(name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.CENTER);
-                    break;
-                case 1:
-                    engine.addText( name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.TOP );
-                    break;
-                case 2:
-                    engine.addText( name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.CENTER );
-                    break;
-                case 3:
-                    engine.addText( name, nameTextpt.x, nameTextpt.y, color, textSize, GrEngine.Halign.CENTER, GrEngine.Valign.BOTTOM );
-                    break;
-            }
-        }
+        if( (option & NAME_VISIBLE) > 0 )
+            engine.addText(name, nameTextpt.x, nameTextpt.y, color, textSize, nameHalign[orientation], nameValign[orientation] );
 
-        if( (option & DESIGNATOR_VISIBLE) > 0 ) {
-            switch( orientation ) {
-                case 0:
-                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.BOTTOM );
-                    break;
-                case 1:
-                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.LEFT, GrEngine.Valign.BOTTOM );
-                    break;
-                case 2:
-                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.BOTTOM );
-                    break;
-                case 3:
-                    engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, GrEngine.Halign.RIGHT, GrEngine.Valign.BOTTOM );
-                    break;
-            }
-        }
-
-        //PINNAME_POSITIONCONGLOMERATE =1 if it exists
-        //NAME_CUSTOMPOSITION_MARGIN ==xx  offset is xx, is tag doesnt exist then xx=0
-        //PINDESIGNATOR_POSITIONCONGLOMERATE =1 if it exists
+        if( (option & DESIGNATOR_VISIBLE) > 0 )
+            engine.addText( designator, desTextpt.x, desTextpt.y, color, textSize, desHalign[ orientation], desValign[ orientation ] );
     }
 
     @Override

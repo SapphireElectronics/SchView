@@ -12,9 +12,41 @@ import ca.sapphire.altium.Options;
 /**
  * Created by Admin on 07/08/15.
  */
+
 public class Text implements GraphicsObject {
     public static enum Halign { LEFT, CENTER, RIGHT };
     public static enum Valign { TOP, CENTER, BOTTOM };
+
+    public static final GrEngine.Halign teztHalign[][] = {
+            {GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT,
+                    GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT,
+                    GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT},
+            {GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT,
+                    GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT,
+                    GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT},
+            {GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT,
+                    GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT,
+                    GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT},
+            {GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT,
+                    GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT,
+                    GrEngine.Halign.RIGHT, GrEngine.Halign.CENTER, GrEngine.Halign.LEFT}
+    };
+    public static final GrEngine.Valign textValign[][] = {
+            {GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM,
+                    GrEngine.Valign.CENTER, GrEngine.Valign.CENTER, GrEngine.Valign.CENTER,
+                    GrEngine.Valign.TOP, GrEngine.Valign.TOP, GrEngine.Valign.TOP},
+            {GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM,
+                    GrEngine.Valign.CENTER, GrEngine.Valign.CENTER, GrEngine.Valign.CENTER,
+                    GrEngine.Valign.TOP, GrEngine.Valign.TOP, GrEngine.Valign.TOP},
+            {GrEngine.Valign.TOP, GrEngine.Valign.TOP, GrEngine.Valign.TOP,
+                    GrEngine.Valign.CENTER, GrEngine.Valign.CENTER, GrEngine.Valign.CENTER,
+                    GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM},
+            {GrEngine.Valign.TOP, GrEngine.Valign.TOP, GrEngine.Valign.TOP,
+                    GrEngine.Valign.CENTER, GrEngine.Valign.CENTER, GrEngine.Valign.CENTER,
+                    GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM, GrEngine.Valign.BOTTOM}
+    };
+
+
     public PointF location, draw;
     int color;
     float textSize;

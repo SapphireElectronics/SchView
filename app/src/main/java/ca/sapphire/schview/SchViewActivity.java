@@ -14,8 +14,10 @@ package ca.sapphire.schview;
  * Todo: Check assumtion of using Black for unspecified colours.
  * Todo: Support all standard sheet sizes
  * Todo: Think about incorporating fling
+ * Todo: Add remaining port symbols
  *
  * Todone: Only show designator if not hidden.
+ * ToDone: Only show port name if not hidden.
  *
  * Based on C1YC schematic
  * Todone: Sheet border: same number of divisions on x and y, but y should only be 4
@@ -25,7 +27,7 @@ package ca.sapphire.schview;
  * Todo: Title block schematic text not appearing (text is null)
  * Todo: Arcs not rendered in parts
  * Todo: Ports not rendered
- * Todo: Earth ground not rendered with correct symbol
+ * Todone: Earth ground not rendered with correct symbol
  * Todo: Pin numbers (eg D4) not rendered at correct orientation
  * Todo: J2 and J3 text not quite placed correctly
  * Todo: Long push not centering on push location when zooming.
@@ -256,9 +258,9 @@ public class SchViewActivity extends Activity {
 
     public void viewFile() {
         viewHandler.postDelayed(viewRunnable, 100);
-        cf = new CompoundFile( "/sdcard/Download/pin.SchDoc");
+//        cf = new CompoundFile( "/sdcard/Download/pin.SchDoc");
 //        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
-//        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
+        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
     }
 
     public void showFile( CompoundFile cf ) {

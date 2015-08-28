@@ -233,13 +233,26 @@ public abstract class Utility {
         }
     }
 
+    static public float addLocationX( Map<String, String> record) {
+        return Float.parseFloat(record.get("LOCATION.X") + "." + (record.containsKey("LOCATION.X_FRAC") ? record.get("LOCATION.X_FRAC") : "0"));
+    }
+
+    static public float addLocationY( Map<String, String> record) {
+        return Float.parseFloat(record.get("LOCATION.Y") + "." + (record.containsKey("LOCATION.Y_FRAC") ? record.get("LOCATION.Y_FRAC") : "0"));
+    }
+
     static public void addLocation( Map<String, String> record, float[] x, float[] y) {
         x[0] = Float.parseFloat(record.get("LOCATION.X") + "." + (record.containsKey("LOCATION.X_FRAC") ? record.get("LOCATION.X_FRAC") : "0"));
         y[0] = Float.parseFloat(record.get("LOCATION.Y") + "." + (record.containsKey("LOCATION.Y_FRAC") ? record.get("LOCATION.Y_FRAC") : "0"));
+    }
+
+    static public void addCorner( Map<String, String> record, float[] x, float[] y) {
         x[1] = Float.parseFloat(record.get("CORNER.X") + "." + (record.containsKey("CORNER.X_FRAC") ? record.get("CORNER.X_FRAC") : "0"));
         y[1] = Float.parseFloat(record.get("CORNER.Y") + "." + (record.containsKey("CORNER.Y_FRAC") ? record.get("CORNER.Y_FRAC") : "0"));
     }
 
+
+    @Deprecated
     static public PointF addLocation( Map<String, String> record) {
         PointF point = new PointF();
 
