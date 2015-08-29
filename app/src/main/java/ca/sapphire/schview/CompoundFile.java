@@ -42,6 +42,7 @@ public class CompoundFile {
     StreamFile sf;
 
     public boolean done = false;
+    public String fileName;
 
     public CompoundFile( String fileName ) {
         // check to see if file has already been converted by comparing file dates
@@ -57,6 +58,7 @@ public class CompoundFile {
     }
 
     void parse( String fileName) {
+        this.fileName = fileName;
         try {
             raf = new RandomAccessFile( fileName, "r" );
         } catch (FileNotFoundException e) {
@@ -185,7 +187,7 @@ public class CompoundFile {
 //        writeFile( streamFileName, raf, cfs.sectorList );
 
         sdf = new StreamedFile( raf, cfs.sectorList, sectorBytes );
-        sf = new StreamFile( sdf );
+        sf = new StreamFile( sdf, fileName );
 
         try {
             raf.close();

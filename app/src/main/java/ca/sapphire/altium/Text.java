@@ -16,15 +16,23 @@ import ca.sapphire.graphics.GrEngine;
 public class Text implements SchObject {
     int x, y, fontId, color;
     String text;
+    boolean valueLookup = false;
 
     float textSize;
 
-    public Text( Map<String, String> record ) {
+    public Text( Map<String, String> record, String[] pairs ) {
         x = Integer.parseInt(record.get("LOCATION.X"));
         y = -Integer.parseInt(record.get("LOCATION.Y"));
         fontId = Integer.parseInt(record.get("FONTID"));
         color = Utility.getColor(record);
         text = record.get("TEXT");
+
+        for( String pair : pairs ) {
+            if( pair.contains( "==" )) {
+                text = pair.substring(pair.lastIndexOf("=") + 1);
+                valueLookup = true;
+            }
+        }
     }
 
 //    @Override
@@ -36,8 +44,12 @@ public class Text implements SchObject {
 
     @Override
     public void render( GrEngine engine ) {
+        if( valueLookup )
+            text = Options.projectOptions.get( text.toLowerCase() );
+
         if( text == null )
             return;
+
         textSize = Options.INSTANCE.fontSize[fontId-1];
         engine.addText( text, x, y, color, textSize );
     }

@@ -11,7 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +96,6 @@ public class StreamFile {
     Map<String, String> result = new HashMap<>();
 
 
-
     public StreamFile(String fileName) {
         try {
             bis = new BufferedInputStream(new FileInputStream(fileName));
@@ -114,7 +115,7 @@ public class StreamFile {
         Log.i(TAG, "Records read: " + recordNumber);
     }
 
-    public StreamFile( StreamedFile sf ) {
+    public StreamFile( StreamedFile sf, String fileName ) {
         long startTime = System.currentTimeMillis();
 
         this.sf = sf;
@@ -125,6 +126,14 @@ public class StreamFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss a");
+
+        Options.putProjectOption( "DocumentFullPathAndName", fileName );
+        Options.putProjectOption( "CurrentDate", dateFormat.format(c.getTime()) );
+        Options.putProjectOption( "CurrentTime", timeFormat.format(c.getTime()) );
 
         Log.i( TAG, "Process time: " + (System.currentTimeMillis() - startTime ) );
 
@@ -167,7 +176,7 @@ public class StreamFile {
                     newObjects.add( new Pin( result, multiPartComponent ));
                     break;
                 case 4:
-                    newObjects.add( new Text( result ));
+                    newObjects.add( new Text( result, pairs ));
                     break;
                 case 6:
                     newObjects.add( new CompMultiLine( result ));

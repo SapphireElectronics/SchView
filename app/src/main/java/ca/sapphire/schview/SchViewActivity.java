@@ -23,8 +23,9 @@ package ca.sapphire.schview;
  * Todone: Sheet border: same number of divisions on x and y, but y should only be 4
  * Todone: Sheet border: should be letters on y axis
  * Todone: Sheet border: no letters at all on right edge
- * Todo: Title block fixed text not appearing (text is null)
- * Todo: Title block schematic text not appearing (text is null)
+ * Todone: Title block fixed text not appearing (text is null)
+ * Todone: Title block schematic text not appearing (text is null)
+ * Todone: Title block date, time, filename not rendered
  * Todo: Arcs not rendered in parts
  * Todo: Ports not rendered
  * Todone: Earth ground not rendered with correct symbol

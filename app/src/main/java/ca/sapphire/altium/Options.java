@@ -42,6 +42,8 @@ public enum Options implements Object {
     int grid = 0;
     String fontName[];
 
+    static public Map<String, String> projectOptions = new HashMap<>();
+
 
     public void put( String[] pairs ) {
         Map<String, String> result = new HashMap<>();
@@ -90,12 +92,16 @@ public enum Options implements Object {
         fontName = new String[fontCount];
 
         for (int i = 0; i < fontCount; i++) {
-            fontSize[i] = Utility.getByteValue(record, "SIZE" + String.valueOf(i + 1));
+            fontSize[i] = (byte) (Utility.getByteValue(record, "SIZE" + String.valueOf(i + 1)) * 0.9);
             fontRotation[i] = Utility.getByteValue(record, "ROTATION" + String.valueOf(i + 1), (byte) 0);
             fontName[i] = record.get("FONTNAME" + String.valueOf(i + 1));
         }
 
         grid = Utility.getIntValue( record, "VISIBLEGRIDSIZE", 0);
+    }
+
+    public static void putProjectOption( String name, String text ) {
+        projectOptions.put( name.toLowerCase(), text );
     }
 
     @Override
