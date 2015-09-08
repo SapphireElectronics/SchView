@@ -56,7 +56,13 @@ public class GrEngine {
             addText(text, x, y, color, size, Halign.LEFT, Valign.BOTTOM);
     }
 
+    @Deprecated
+    // Reason: orientation should be specified
     public void addText( String text, float x, float y, int color, float size, Halign hAlign, Valign vAlign ) {
+        addText(text, x, y, color, size, hAlign, vAlign, 0);
+    }
+
+    public void addText( String text, float x, float y, int color, float size, Halign hAlign, Valign vAlign, int orientation ) {
 //        if( text == null ) {
 //            text = ".";
 //            return;
@@ -67,7 +73,7 @@ public class GrEngine {
         if( !texts.containsKey( paintIndex ))
             texts.put( paintIndex, new ArrayList<TextString>() );
 
-        TextString ts = new TextString(text, x, y, color, size );
+        TextString ts = new TextString(text, x, y, color, size, orientation );
         ts.hAlign(hAlign);
         ts.vAlign(vAlign);
 
@@ -85,6 +91,16 @@ public class GrEngine {
 
     public void addArc( float x, float y, float radius, float startAngle, float endAngle, int color ) {
         arcs.add( new Arc( x, y, radius, startAngle, endAngle, color ));
+    }
+
+    public void addRect( float left, float top, float right, float bottom, int color, boolean filled ) {
+        Path path = new Path();
+        path.moveTo( left, top );
+        path.lineTo(right, top);
+        path.lineTo(right, bottom);
+        path.lineTo(left, bottom);
+        path.lineTo(left, top);
+        shapes.add( new Shape( path, color, filled ));
     }
 
     public void render() {
@@ -124,7 +140,15 @@ public class GrEngine {
             Paint newpaint = paintList.get( entry.getKey() );
             for( TextString ts : entry.getValue() ) {
 //                try {
-                    canvas.drawText( ts.text, ts.x, ts.y, newpaint );
+                    if( ts.orientation == 1 ) {
+                        canvas.save();
+                        canvas.rotate( 90f, ts.x, ts.y );
+                        canvas.drawText( ts.text, ts.x, ts.y, newpaint );
+                        canvas.restore();
+                    }
+                    else
+                        canvas.drawText( ts.text, ts.x, ts.y, newpaint );
+
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
@@ -165,16 +189,18 @@ public class GrEngine {
     class TextString {
         float x, y, size;
         int color;
+        int orientation;
         String text;
         Rect bounds = new Rect();
         Paint paint = new Paint();
 
-        public TextString( String text, float x, float y, int color, float size ) {
+        public TextString( String text, float x, float y, int color, float size, int orientation ) {
             this.text = text;
             this.x = x;
             this.y = y;
             this.color = color;
             this.size = size;
+            this.orientation = orientation;
         }
 
         public void hAlign( Halign hAlign ) {

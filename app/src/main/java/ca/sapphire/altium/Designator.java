@@ -42,7 +42,7 @@ public class Designator extends SchBase implements SchObject {
             return;
 
         textSize = Options.INSTANCE.fontSize[fontId-1];
-        engine.addText(name, x, y, color, textSize, Text.teztHalign[orientation][justification], Text.textValign[orientation][justification] );
+        engine.addText(name, x, y, color, textSize, Text.textHalign[orientation][justification], Text.textValign[orientation][justification] );
     }
 
     @Override

@@ -1,16 +1,12 @@
 package ca.sapphire.schview;
 
 import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
-import android.util.SparseIntArray;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +28,7 @@ import ca.sapphire.altium.Field;
 import ca.sapphire.altium.Junction;
 import ca.sapphire.altium.Options;
 import ca.sapphire.altium.Pin;
+import ca.sapphire.altium.Port;
 import ca.sapphire.altium.PowerPort;
 import ca.sapphire.altium.Text;
 import ca.sapphire.altium.Wire;
@@ -195,6 +192,9 @@ public class StreamFile {
                     break;
                 case 17:
                     newObjects.add( new PowerPort( result ) );
+                    break;
+                case 18:
+                    newObjects.add( new Port( result ) );
                     break;
                 case 25:
                     newObjects.add( new Designator( result ));

@@ -1,17 +1,17 @@
 package ca.sapphire.schview;
 
 /**
- * Todo: refactor compound file reader
+ * Todone: refactor compound file reader
  * Todo: fix text rotations and orientations (rotating is only a hack, and that's only for Attribute
  * Todo: make basic and advanced versions (for distribution) based on what is viewable
- * Todo: add selectable input file
- * Todo: add title block, check for standard block, add text
- * Todo: refactor drawing and rendering to move into Engine
+ * Todo: add selectable input file and exit gracefully if file is wrong format or doesn't exist
+ * Todone: add title block, check for standard block, add text
+ * Todo: refactor drawing and rendering to move into Engine - in progress
  * Todo: long press does not centre properly but does set correct zoom
  * Todo: add preferences to open last file viewed if one is not selected
- * Todo: add preference to set long press zoom and double tap zoom
+ * Todone: add preference to set long press zoom and double tap zoom
  *
- * Todo: Check assumtion of using Black for unspecified colours.
+ * Todo: Check assumption of using Black for unspecified colours.
  * Todo: Support all standard sheet sizes
  * Todo: Think about incorporating fling
  * Todo: Add remaining port symbols
@@ -26,11 +26,11 @@ package ca.sapphire.schview;
  * Todone: Title block fixed text not appearing (text is null)
  * Todone: Title block schematic text not appearing (text is null)
  * Todone: Title block date, time, filename not rendered
- * Todo: Arcs not rendered in parts
+ * Todone: Arcs not rendered in parts
  * Todo: Ports not rendered
  * Todone: Earth ground not rendered with correct symbol
  * Todo: Pin numbers (eg D4) not rendered at correct orientation
- * Todo: J2 and J3 text not quite placed correctly
+ * Todone: J2 and J3 text not quite placed correctly
  * Todo: Long push not centering on push location when zooming.
  * Todo: NoERC not rendered.
  *
@@ -64,12 +64,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -181,16 +183,35 @@ public class SchViewActivity extends Activity {
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
+        viewHandler.postDelayed(viewRunnable, 100);
+        cf = new CompoundFile( getFileToOpen() );
+    }
+
+    protected String getFileToOpen() {
         // get the intent and intent data that started this activity
         // to see if it was launched with a filename.
+        // If no file name specified, use last file opened as stored in preferences
+
         Intent intent = getIntent();
         Uri data = intent.getData();
 
-        Log.i( TAG, "Data: " + data );
-        Log.i( TAG, "Type: " + intent.getType() );
-        Log.i( TAG, "Intent: " + intent );
+        Log.i(TAG, "Data: " + data);
 
-        viewFile();
+        if( data != null ) {
+            Log.i(TAG, "Data: " + data.getPath());
+            return data.getPath();
+        }
+
+        String path = Environment.getExternalStorageDirectory().getPath();
+        SharedPreferences prefs = getPreferences( MODE_PRIVATE );
+        return prefs.getString( "LastOpenedFile", path + "/Download/c1yc_ldm.SchDoc" );
+    }
+
+    protected void writeFileNameToPreferences() {
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString( "LastOpenedFile", cf.fileName );
+        editor.apply();
     }
 
     @Override
@@ -248,6 +269,7 @@ public class SchViewActivity extends Activity {
             if( cf != null)
                 if( cf.done )
                     if( !shown ) {
+                        writeFileNameToPreferences();
                         showFile( cf );
                         shown = true;
                         viewHandler.removeCallbacks( viewRunnable );
@@ -256,13 +278,6 @@ public class SchViewActivity extends Activity {
             viewHandler.postDelayed( viewRunnable, 100 );
         }
     };
-
-    public void viewFile() {
-        viewHandler.postDelayed(viewRunnable, 100);
-//        cf = new CompoundFile( "/sdcard/Download/pin.SchDoc");
-//        cf = new CompoundFile( "/sdcard/Download/gclk.SchDoc");
-        cf = new CompoundFile( "/sdcard/Download/c1yc_ldm.SchDoc");
-    }
 
     public void showFile( CompoundFile cf ) {
         Log.i(TAG, "Ready to show.");

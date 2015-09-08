@@ -78,7 +78,7 @@ Enumerated List:
 [26] Bus
 [27] Wire
 [28] Text Frame
-[29] Junction Manual / Juntion Automatic
+[29] Junction Manual / Junction Automatic
 [30] Graphic
 [31] Options
 [32] Sheet Designator

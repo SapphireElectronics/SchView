@@ -36,6 +36,8 @@ public class CompoundFile {
     ArrayList<Integer> dirTraverse = new ArrayList<>();  // list of directories compiled when traversing the directory tree
     List<Directory> directories = new ArrayList<>();
 
+    ArrayList<String> fileNameList = new ArrayList<>();
+
     int sectorBytes;
 
     StreamedFile sdf;
@@ -57,6 +59,12 @@ public class CompoundFile {
         done = true;
     }
 
+    /**
+     *
+     * @param fileName
+     *
+     * Returns a list of files in the compound file, or null if not a compound file.
+     */
     void parse( String fileName) {
         this.fileName = fileName;
         try {
@@ -240,6 +248,7 @@ public class CompoundFile {
         int offset = (id % dirsPerSector) * 128;
 
         dir.read( dirSectors.get( secID ), offset );
+        fileNameList.add( dir.name );
 
         if( dir.rootDirID != -1 )
             traverse(dir.rootDirID);

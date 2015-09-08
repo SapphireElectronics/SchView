@@ -5,7 +5,6 @@ import android.graphics.PointF;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import ca.sapphire.graphics.GrEngine;
@@ -50,7 +49,7 @@ public class Attribute extends SchBase implements SchObject {
             return;
 
         textSize = Options.INSTANCE.fontSize[fontId-1];
-        engine.addText(text, x, y, color, textSize, Text.teztHalign[orientation][justification], Text.textValign[orientation][justification] );
+        engine.addText(text, x, y, color, textSize, Text.textHalign[orientation][justification], Text.textValign[orientation][justification] );
     }
 
     @Override

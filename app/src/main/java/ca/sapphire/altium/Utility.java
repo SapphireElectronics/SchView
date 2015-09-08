@@ -97,6 +97,13 @@ public abstract class Utility {
         return altiumToRGB(Integer.parseInt(color));
     }
 
+    static public int getColor( Map<String, String> record, String field ) {
+        String color = record.get( field );
+        if( color == null )
+            return Color.BLACK;
+
+        return altiumToRGB(Integer.parseInt(color));
+    }
 
 
     /**
@@ -282,6 +289,8 @@ public abstract class Utility {
         return 0xff000000 | red | grn | blu;
     }
 
+
+    @Deprecated
     static public Path polygon( Point[] point ) {
         Path path = new Path();
         path.moveTo( point[0].x, point[0].y );
@@ -289,6 +298,15 @@ public abstract class Utility {
             path.lineTo( point[i].x, point[i].y );
         }
         path.lineTo( point[0].x, point[0].y );
+        return path;
+    }
+
+    static public Path polygon( int x[], int y[] ) {
+        Path path = new Path();
+        path.moveTo( x[0], y[0] );
+        for (int i = 1; i < x.length; i++)
+            path.lineTo( x[i], y[i] );
+        path.lineTo( x[0], x[0] );
         return path;
     }
 }

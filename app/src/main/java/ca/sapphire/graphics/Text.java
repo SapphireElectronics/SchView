@@ -17,7 +17,7 @@ public class Text implements GraphicsObject {
     public static enum Halign { LEFT, CENTER, RIGHT };
     public static enum Valign { TOP, CENTER, BOTTOM };
 
-    public static final GrEngine.Halign teztHalign[][] = {
+    public static final GrEngine.Halign textHalign[][] = {
             {GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT,
                     GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT,
                     GrEngine.Halign.LEFT, GrEngine.Halign.CENTER, GrEngine.Halign.RIGHT},
